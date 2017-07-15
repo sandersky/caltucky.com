@@ -33,8 +33,8 @@ class Post extends React.Component<void, Props, void> {
     const contentObject = {__html: content.rendered}
 
     return [
-      <h2>{title.rendered}</h2>,
-      <div dangerouslySetInnerHTML={contentObject}/>,
+      <h2 key="title">{title.rendered}</h2>,
+      <div dangerouslySetInnerHTML={contentObject} key="content"/>,
     ]
   }
 
