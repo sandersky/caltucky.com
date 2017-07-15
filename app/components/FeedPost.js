@@ -26,7 +26,8 @@ function getPostStyle (margin: number, width: number) {
 export default (props: Props) => {
   const {post, margin, width} = props
   const imageSrc = `${post.featured_media_url}?h=${width}&w=${width}&crop=1`
-  const linkHref = `#/posts/${post.slug}`
+  const [year, month, day] = post.date_gmt.toISOString().split(/[-T]/)
+  const linkHref = `/${year}/${month}/${day}/${post.slug}`
   const title = {__html: post.title.rendered}
 
   const passthroughProps = {

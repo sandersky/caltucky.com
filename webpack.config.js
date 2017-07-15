@@ -31,6 +31,7 @@ function getPlugins () {
 module.exports = {
   devServer: {
     contentBase: PUBLIC_PATH,
+    historyApiFallback: true,
     https: true,
   },
   devtool: 'source-map',

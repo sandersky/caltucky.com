@@ -4,21 +4,16 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import {HashRouter, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 
+// $FlowFixMe
+import './App.scss'
 import ConnectedMenu from './ConnectedMenu'
 import Feed from './FeedRoute'
 import Post from './PostRoute'
 import appReducer from './reducers'
-
-const APP_CONTAINER_STYLE = {
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-  width: '100%',
-}
 
 const store = createStore(
   appReducer,
@@ -28,15 +23,15 @@ const store = createStore(
 export default () => {
   return (
     <Provider store={store}>
-      <HashRouter>
-        <div style={APP_CONTAINER_STYLE}>
+      <BrowserRouter>
+        <div className="App">
           <ConnectedMenu/>
           <Switch>
             <Route component={Feed} exact path="/"/>
-            <Route component={Post} path="/posts/:slug"/>
+            <Route component={Post} path="/:year/:month/:day/:slug"/>
           </Switch>
         </div>
-      </HashRouter>
+      </BrowserRouter>
     </Provider>
   )
 }

@@ -68,7 +68,7 @@ class Menu extends React.Component<void, Props, void> {
     return (
       <div className="Menu">
         <Link to="/">
-          <img alt="Caltucky" src={require('../assets/logo.png')}/>
+          <img alt="Caltucky" src={`/${require('../assets/logo.png')}`}/>
         </Link>
         {items}
         <input placeholder="search"/>
