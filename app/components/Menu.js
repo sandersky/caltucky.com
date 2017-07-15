@@ -2,13 +2,17 @@
  * @flow
  */
 
+/* global HTMLInputElement */
+
 import React from 'react'
 import {Link} from 'react-router-dom'
 
+import {ENTER} from '../lib/keycodes'
+import timer, {type SetTimeout} from '../lib/timer'
+import type {Category, Page} from '../types'
 // $FlowFixMe
 import './Menu.scss'
 import MenuItem from './MenuItem'
-import type {Category, Page} from '../types'
 
 type Item = {
   id: number,
@@ -23,7 +27,11 @@ type Props = {
   pagesError?: Error,
   loadCategories: () => void,
   loadPages: () => void,
+  search: (query: string) => void,
+  setTimeout: SetTimeout,
 }
+
+const SEARCH_DEBOUNCE = 250
 
 class Menu extends React.Component<void, Props, void> {
   props: Props
@@ -63,6 +71,21 @@ class Menu extends React.Component<void, Props, void> {
       })
   }
 
+  _handleSearchKeyUp (event: SyntheticKeyboardEvent) {
+    const element = event.currentTarget
+
+    if (element instanceof HTMLInputElement) {
+      // If user hits enter key immediately invoke search
+      if (event.keyCode === ENTER) {
+        this.props.search(element.value)
+      } else {
+        this.props.setTimeout(() => {
+          this.props.search(element.value)
+        }, SEARCH_DEBOUNCE)
+      }
+    }
+  }
+
   render () {
     const items = this._getMenuItems()
     return (
@@ -71,10 +94,13 @@ class Menu extends React.Component<void, Props, void> {
           <img alt="Caltucky" src={`/${require('../assets/logo.png')}`}/>
         </Link>
         {items}
-        <input placeholder="search"/>
+        <input
+          onKeyUp={this._handleSearchKeyUp.bind(this)}
+          placeholder="search"
+        />
       </div>
     )
   }
 }
 
-export default Menu
+export default timer(Menu)

@@ -4,11 +4,13 @@
 
 import React from 'react'
 
+import timer, {type SetTimeout} from '../../lib/timer'
 // $FlowFixMe
 import './FadeAndRotate.scss'
 
 type Props = {
   duration?: number,
+  setTimeout: SetTimeout,
   tagName?: 'a' | 'div',
 }
 
@@ -19,10 +21,6 @@ type State = {
 class Fade extends React.Component {
   props: Props
   state: State
-
-  static defaultProps: {
-    duration: 300,
-  }
 
   constructor (props: Props) {
     super(props)
@@ -37,9 +35,9 @@ class Fade extends React.Component {
   }
 
   componentDidMount () {
-    setTimeout(() => {
+    this.props.setTimeout(() => {
       this.setState({entered: true})
-    }, this.props.duration)
+    }, this.props.duration || 300)
   }
 
   render () {
@@ -54,7 +52,9 @@ class Fade extends React.Component {
     }
 
     // Make sure we omit properties specific to this React component
-    delete props.tagName
+    ;['setTimeout', 'tagName'].forEach((key) => {
+      delete props[key]
+    })
 
     if (tagName === 'a') {
       return <a {...props}/>
@@ -64,4 +64,4 @@ class Fade extends React.Component {
   }
 }
 
-export default Fade
+export default timer(Fade)

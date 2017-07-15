@@ -9,9 +9,11 @@ import {type PostOptions} from './actions/wordpress'
 import Feed from './components/Feed'
 
 const mapStateToProps = ({blog}) => {
+  const {filteredPosts, posts, postsError, query} = blog
+
   return {
-    posts: blog.posts,
-    postsError: blog.postsError,
+    posts: query ? filteredPosts : posts,
+    postsError,
   }
 }
 

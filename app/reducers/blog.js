@@ -7,25 +7,20 @@ import {
   ADD_CATEGORIES,
   ADD_PAGES,
   ADD_POSTS,
+  FILTER_POSTS,
+  SET_SEARCH_QUERY,
+  type State,
 } from '../actions/blog'
-import type {Category, Page, Post} from '../types'
-
-export type BlogState = {
-  categories: Array<Category>,
-  categoriesError?: Error,
-  pages: Array<Page>,
-  pagesError?: Error,
-  posts: Array<Post>,
-  postsError?: Error,
-}
 
 const INITIAL_STATE = {
   categories: [],
+  filteredPosts: [],
   pages: [],
   posts: [],
+  query: '',
 }
 
-export default (state: BlogState, action: Action) => {
+export default (state: State, action: Action) => {
   switch (action.type) {
     case ADD_CATEGORIES: {
       const categories = state.categories || []
@@ -118,6 +113,16 @@ export default (state: BlogState, action: Action) => {
       // Since new posts were added we need to shallow copy our state with
       // the updated posts
       return {...state, posts: nextPosts}
+    }
+
+    case FILTER_POSTS: {
+      // TODO: this is inefficient, we should re-use items from posts array
+      // in order to prevent duplicate copies in memory
+      return {...state, filteredPosts: action.posts}
+    }
+
+    case SET_SEARCH_QUERY: {
+      return {...state, query: action.query}
     }
 
     default:

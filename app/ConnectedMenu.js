@@ -4,7 +4,7 @@
 
 import {connect} from 'react-redux'
 
-import {loadCategories, loadPages} from './actions/blog'
+import {loadCategories, loadPages, search} from './actions/blog'
 import Menu from './components/Menu'
 
 const mapStateToProps = ({blog}) => {
@@ -24,6 +24,10 @@ const mapDispatchToProps = (dispatch) => {
 
     loadPages () {
       dispatch(loadPages())
+    },
+
+    search (query: string) {
+      dispatch(search(query))
     },
   }
 }
