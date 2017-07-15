@@ -25,23 +25,21 @@ class Page extends React.Component<void, Props, void> {
   }
 
   _renderErrorState (error: Error) {
-    return <div>An error occurred</div>
+    return 'An error occurred'
   }
 
   _renderLoadedState (page: PageType) {
     const {content, title} = page
     const contentObject = {__html: content.rendered}
 
-    return (
-      <div>
-        <h2>{title.rendered}</h2>
-        <div dangerouslySetInnerHTML={contentObject}/>
-      </div>
-    )
+    return [
+      <h2>{title.rendered}</h2>,
+      <div dangerouslySetInnerHTML={contentObject}/>,
+    ]
   }
 
   _renderLoadingState () {
-    return <div>Loading page</div>
+    return 'Loading page'
   }
 
   render () {
