@@ -5,6 +5,8 @@
 import React from 'react'
 
 import type {Match, Page as PageType} from '../types'
+// $FlowFixMe
+import './Page.scss'
 
 type Props = {
   error?: Error,
@@ -44,9 +46,22 @@ class Page extends React.Component<void, Props, void> {
 
   render () {
     const {error, page} = this.props
-    if (error) return this._renderErrorState(error)
-    if (page) return this._renderLoadedState(page)
-    return this._renderLoadingState()
+
+    let child
+
+    if (error) {
+      child = this._renderErrorState(error)
+    } else if (page) {
+      child = this._renderLoadedState(page)
+    } else {
+      child = this._renderLoadingState()
+    }
+
+    return (
+      <div className="Page">
+        {child}
+      </div>
+    )
   }
 }
 

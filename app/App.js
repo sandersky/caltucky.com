@@ -27,11 +27,14 @@ export default () => {
       <BrowserRouter>
         <div className="App">
           <ConnectedMenu/>
-          <Switch>
-            <Route component={Feed} exact path="/"/>
-            <Route component={Post} path="/:year/:month/:day/:slug"/>
-            <Route component={Page} path="/:slug"/>
-          </Switch>
+          <div className="AppContentPane">
+            <div/>
+            <Switch>
+              <Route component={Feed} exact path="/"/>
+              <Route component={Post} path="/:year/:month/:day/:slug"/>
+              <Route component={Page} path="/:slug"/>
+            </Switch>
+          </div>
         </div>
       </BrowserRouter>
     </Provider>

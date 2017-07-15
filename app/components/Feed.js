@@ -163,10 +163,7 @@ class Feed extends React.Component<void, Props, void> {
         onScroll={this._handleScroll.bind(this)}
         ref={(el) => this._element = el}
       >
-        <div/>
-        <div>
-          {child}
-        </div>
+        {child}
       </div>
     )
   }
