@@ -1,0 +1,23 @@
+.Feed {
+  display: flex;
+  flex: 1;
+  position: relative;
+
+  div:first-child {
+    background: linear-gradient(rgba(200, 200, 200, 0.7), transparent);
+    height: 10;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
+
+  div:last-child {
+    align-content: flex-start;
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+  }
+}

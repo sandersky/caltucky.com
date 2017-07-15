@@ -1,0 +1,16 @@
+.Menu {
+  align-items: center;
+  background: linear-gradient(#fff, #eee);
+  borderBottom: 1px solid #ddd;
+  display: flex;
+  flex: none;
+  padding: 6;
+
+  input {
+    font: 120% Raleway, sans-serif;
+    flex: 1;
+    height: 30;
+    margin: 0 10px;
+    padding: 0 4px;
+  }
+}
