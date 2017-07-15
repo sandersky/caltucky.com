@@ -10,6 +10,19 @@ import type {
   RawPost,
 } from '../types'
 
+export type CategoryOptions = {
+  page?: number,
+  per_page?: number,
+  search?: string,
+}
+
+export type PageOptions = {
+  after?: string,
+  page?: number,
+  per_page?: number,
+  search?: string,
+}
+
 export type PostOptions = {
   after?: string,
   page?: number,
@@ -71,16 +84,12 @@ function normalizePosts (posts: Array<RawPost>): Array<Post> {
 }
 
 export default {
-  categories (): Promise<Array<Category>> {
-    return fetchData('categories')
+  categories (options?: CategoryOptions): Promise<Array<Category>> {
+    return fetchData('categories', options)
   },
 
-  pages () {
-    return fetchData('pages').then(normalizePages)
-  },
-
-  post (slug: string): Promise<Array<Post>> {
-    return fetchData(`posts?slug=${slug}`).then(normalizePosts)
+  pages (options?: PageOptions) {
+    return fetchData('pages', options).then(normalizePages)
   },
 
   posts (options?: PostOptions): Promise<Array<Post>> {

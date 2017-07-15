@@ -4,21 +4,21 @@
 
 import React from 'react'
 
-import type {Match, Post as PostType} from '../types'
+import type {Match, Page as PageType} from '../types'
 
 type Props = {
   error?: Error,
-  loadPost: (slug: string) => void,
+  loadPage: (slug: string) => void,
   match: Match,
-  post?: PostType,
+  page?: PageType,
 }
 
-class Post extends React.Component<void, Props, void> {
+class Page extends React.Component<void, Props, void> {
   props: Props
 
   componentWillMount () {
-    if (!this.props.post) {
-      this.props.loadPost(this.props.match.params.slug)
+    if (!this.props.page) {
+      this.props.loadPage(this.props.match.params.slug)
     }
   }
 
@@ -26,8 +26,8 @@ class Post extends React.Component<void, Props, void> {
     return <div>An error occurred</div>
   }
 
-  _renderLoadedState (post: PostType) {
-    const {content, title} = post
+  _renderLoadedState (page: PageType) {
+    const {content, title} = page
     const contentObject = {__html: content.rendered}
 
     return (
@@ -39,15 +39,15 @@ class Post extends React.Component<void, Props, void> {
   }
 
   _renderLoadingState () {
-    return <div>Loading post</div>
+    return <div>Loading page</div>
   }
 
   render () {
-    const {error, post} = this.props
+    const {error, page} = this.props
     if (error) return this._renderErrorState(error)
-    if (post) return this._renderLoadedState(post)
+    if (page) return this._renderLoadedState(page)
     return this._renderLoadingState()
   }
 }
 
-export default Post
+export default Page

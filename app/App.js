@@ -12,6 +12,7 @@ import thunk from 'redux-thunk'
 import './App.scss'
 import ConnectedMenu from './ConnectedMenu'
 import Feed from './FeedRoute'
+import Page from './PageRoute'
 import Post from './PostRoute'
 import appReducer from './reducers'
 
@@ -29,6 +30,7 @@ export default () => {
           <Switch>
             <Route component={Feed} exact path="/"/>
             <Route component={Post} path="/:year/:month/:day/:slug"/>
+            <Route component={Page} path="/:slug"/>
           </Switch>
         </div>
       </BrowserRouter>

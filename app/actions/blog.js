@@ -79,9 +79,9 @@ export function loadCategories () {
   }
 }
 
-export function loadPages () {
+export function loadPage (slug: string) {
   return function (dispatch: Dispatch) {
-    blog.pages()
+    blog.pages({slug})
       .then((pages) => {
         dispatch(addPages(pages))
       })
@@ -94,7 +94,7 @@ export function loadPages () {
 
 export function loadPost (slug: string) {
   return function (dispatch: Dispatch) {
-    blog.post(slug)
+    blog.posts({slug})
       .then((posts) => {
         dispatch(addPosts(posts))
       })
