@@ -4,6 +4,7 @@
 
 import React from 'react'
 
+import {parse} from '../lib/parser'
 import type {Match, Page as PageType} from '../types'
 // $FlowFixMe
 import './Page.scss'
@@ -16,6 +17,7 @@ type Props = {
 }
 
 function normalizedContent (content: string) {
+  console.info(parse(content))
   return content
 }
 

@@ -9,6 +9,26 @@ function esc (text) {
 describe('parser', () => {
   describe('parses', () => {
     ;[
+      // Text
+      {
+        inputs: [
+          'Test',
+        ],
+        tree: {
+          text: 'Test',
+          type: 'text',
+        },
+      },
+      {
+        inputs: [
+          'Foo bar',
+        ],
+        tree: {
+          text: 'Foo bar',
+          type: 'text',
+        },
+      },
+
       // Self closing tag without attributes
       {
         inputs: [
@@ -25,6 +45,60 @@ describe('parser', () => {
         tree: {
           name: 'input',
           type: 'element',
+        },
+      },
+
+      // Self closing tag without attributes and text before element
+      {
+        inputs: [
+          'Foo bar<input/>',
+          'Foo bar< input/>',
+          'Foo bar<\tinput/>',
+          'Foo bar<\ninput/>',
+          'Foo bar< \t\ninput/>',
+          'Foo bar<input />',
+          'Foo bar<input\t/>',
+          'Foo bar<input\n/>',
+          'Foo bar<input \t\n/>',
+        ],
+        tree: {
+          children: [
+            {
+              text: 'Foo bar',
+              type: 'text',
+            },
+            {
+              name: 'input',
+              type: 'element',
+            },
+          ],
+        },
+      },
+
+      // Self closing tag without attributes and text after element
+      {
+        inputs: [
+          '<input/>Foo bar',
+          '< input/>Foo bar',
+          '<\tinput/>Foo bar',
+          '<\ninput/>Foo bar',
+          '< \t\ninput/>Foo bar',
+          '<input />Foo bar',
+          '<input\t/>Foo bar',
+          '<input\n/>Foo bar',
+          '<input \t\n/>Foo bar',
+        ],
+        tree: {
+          children: [
+            {
+              name: 'input',
+              type: 'element',
+            },
+            {
+              text: 'Foo bar',
+              type: 'text',
+            },
+          ],
         },
       },
 

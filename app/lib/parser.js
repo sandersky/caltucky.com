@@ -1,20 +1,30 @@
 const WHITESPACE = /\s/
 
 export function parse (content: string) {
-  let attributeName, buffer, closingQuote, currentNode, isClosingTag,
-    parsingAttributeValue, parsingElementName, tree
+  let attributeName, closingQuote, currentNode, isClosingTag,
+    parsingAttributeValue, parsingElement, parsingElementName, tree
+
+  let buffer = []
 
   for (let i = 0, len = content.length; i < len; i++) {
     const c = content[i]
 
     switch (c) {
       case '<': {
+        if (buffer.length) {
+          tree = {
+            text: buffer.join(''),
+            type: 'text',
+          }
+        }
+
         buffer = []
         currentNode = {
           type: 'element',
         }
         isClosingTag = false
         parsingElementName = true
+        parsingElement = true
         break
       }
 
@@ -22,11 +32,20 @@ export function parse (content: string) {
         if (!tree) {
           tree = currentNode
         } else if (!isClosingTag && tree) {
-          if (!tree.children) {
-            tree.children = []
-          }
+          if (tree.type === 'text') {
+            tree = {
+              children: [
+                tree,
+                currentNode,
+              ],
+            }
+          } else {
+            if (!tree.children) {
+              tree.children = []
+            }
 
-          tree.children.push(currentNode)
+            tree.children.push(currentNode)
+          }
         }
 
         // If this is a tag without attributes
@@ -36,6 +55,7 @@ export function parse (content: string) {
           parsingElementName = false
         }
 
+        parsingElement = false
         break
       }
 
@@ -116,18 +136,18 @@ export function parse (content: string) {
           if (parsingElementName) {
             currentNode.name = buffer.join('')
             parsingElementName = false
-
-          // If we just finished parsing a boolean attribute name
-          } else {
+            buffer = []
+            break
+            // If we just finished parsing a boolean attribute name
+          } else if (parsingElement) {
             if (!currentNode.attributes) {
               currentNode.attributes = {}
             }
 
             currentNode.attributes[buffer.join('')] = true
+            buffer = []
+            break
           }
-
-          buffer = []
-          break
         }
 
         // Since we are in the process of parsing a node name, attribute name,
@@ -135,6 +155,24 @@ export function parse (content: string) {
         buffer.push(c)
         break
       }
+    }
+  }
+
+  if (buffer.length) {
+    currentNode = {
+      text: buffer.join(''),
+      type: 'text',
+    }
+
+    if (!tree) {
+      return currentNode
+    }
+
+    return {
+      children: [
+        tree,
+        currentNode,
+      ],
     }
   }
 
