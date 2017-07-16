@@ -1,7 +1,8 @@
 const WHITESPACE = /\s/
 
 export function parse (content: string) {
-  let buffer, currentNode, isClosingTag, parsingElementName, tree
+  let attributeName, buffer, closingQuote, currentNode, isClosingTag,
+    parsingAttributeValue, parsingElementName, tree
 
   for (let i = 0, len = content.length; i < len; i++) {
     const c = content[i]
@@ -52,7 +53,7 @@ export function parse (content: string) {
             isClosingTag = true
           }
 
-          continue
+          break
         }
 
         if (buffer.length) {
@@ -68,9 +69,48 @@ export function parse (content: string) {
         break
       }
 
+      case '=': {
+        attributeName = buffer.join('')
+        buffer = []
+        parsingAttributeValue = true
+        break
+      }
+
+      case '"': {
+        if (parsingAttributeValue && buffer.length === 0) {
+          closingQuote = '"'
+        } else if (closingQuote === '"') {
+          if (!currentNode.attributes) {
+            currentNode.attributes = {}
+          }
+
+          currentNode.attributes[attributeName] = buffer.join('')
+          buffer = []
+          parsingAttributeValue = false
+        }
+
+        break
+      }
+
+      case "'": {
+        if (parsingAttributeValue && buffer.length === 0) {
+          closingQuote = "'"
+        } else if (closingQuote === "'") {
+          if (!currentNode.attributes) {
+            currentNode.attributes = {}
+          }
+
+          currentNode.attributes[attributeName] = buffer.join('')
+          buffer = []
+          parsingAttributeValue = false
+        }
+
+        break
+      }
+
       default: {
         if (WHITESPACE.test(c)) {
-          if (buffer.length === 0) continue
+          if (buffer.length === 0) break
 
           // If this is a tag with whitespace before/after the tag name
           if (parsingElementName) {
@@ -87,7 +127,7 @@ export function parse (content: string) {
           }
 
           buffer = []
-          continue
+          break
         }
 
         // Since we are in the process of parsing a node name, attribute name,

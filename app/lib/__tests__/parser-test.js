@@ -58,6 +58,35 @@ describe('parser', () => {
         },
       },
 
+      // Self closing tag with attribute with value in single quotes
+
+      {
+        inputs: [
+          "<input value='test'/>",
+        ],
+        tree: {
+          attributes: {
+            value: 'test',
+          },
+          name: 'input',
+          type: 'element',
+        },
+      },
+
+      // Self closing tag with attribute with value in double quoutes
+      {
+        inputs: [
+          '<input value="test"/>',
+        ],
+        tree: {
+          attributes: {
+            value: 'test',
+          },
+          name: 'input',
+          type: 'element',
+        },
+      },
+
       // Tag with closing tag but no attributes or children
       {
         inputs: [
