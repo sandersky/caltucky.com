@@ -31,6 +31,7 @@ export function parse (content: string) {
         // If this is a tag without attributes
         if (parsingElementName) {
           currentNode.name = buffer.join('')
+          buffer = []
           parsingElementName = false
         }
 
@@ -43,6 +44,7 @@ export function parse (content: string) {
           // If this is a self-closing tag
           if (buffer.length) {
             currentNode.name = buffer.join('')
+            buffer = []
             parsingElementName = false
 
           // If this is a closing tag
@@ -53,19 +55,38 @@ export function parse (content: string) {
           continue
         }
 
+        if (buffer.length) {
+          // We must have been parsing a boolean attribute
+          if (!currentNode.attributes) {
+            currentNode.attributes = {}
+          }
+
+          currentNode.attributes[buffer.join('')] = true
+          buffer = []
+        }
+
         break
       }
 
       default: {
-        // If this is a tag with whitespace before/after the tag name
-        if (parsingElementName && WHITESPACE.test(c)) {
-          // If the whitespace is after the tag name then we are done parsing
-          // the tag name
-          if (buffer.length) {
+        if (WHITESPACE.test(c)) {
+          if (buffer.length === 0) continue
+
+          // If this is a tag with whitespace before/after the tag name
+          if (parsingElementName) {
             currentNode.name = buffer.join('')
             parsingElementName = false
-          } // else we don't care and can simply disregard the whitespace
 
+          // If we just finished parsing a boolean attribute name
+          } else {
+            if (!currentNode.attributes) {
+              currentNode.attributes = {}
+            }
+
+            currentNode.attributes[buffer.join('')] = true
+          }
+
+          buffer = []
           continue
         }
 
