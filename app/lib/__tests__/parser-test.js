@@ -1,0 +1,115 @@
+import {parse} from '../parser'
+
+function esc (text) {
+  return text
+    .replace(/\n/g, '\\n')
+    .replace(/\t/g, '\\t')
+}
+
+describe('parser', () => {
+  describe('parses', () => {
+    ;[
+      // Self closing tag without attributes
+      {
+        inputs: [
+          '<input/>',
+          '< input/>',
+          '<\tinput/>',
+          '<\ninput/>',
+          '< \t\ninput/>',
+          '<input />',
+          '<input\t/>',
+          '<input\n/>',
+          '<input \t\n/>',
+        ],
+        tree: {
+          name: 'input',
+          type: 'element',
+        },
+      },
+
+      // Tag with closing tag but no attributes or children
+      {
+        inputs: [
+          '<div></div>',
+          '< div></div>',
+          '<\tdiv></div>',
+          '<\ndiv></div>',
+          '< \t\ndiv></div>',
+          '<div ></div>',
+          '<div\t></div>',
+          '<div\n></div>',
+          '<div \t\n></div>',
+          '<div>< /div>',
+          '<div><\t/div>',
+          '<div><\n/div>',
+          '<div>< \t\n/div>',
+          '<div></ div>',
+          '<div></\tdiv>',
+          '<div></\ndiv>',
+          '<div></ \t\ndiv>',
+          '<div></div >',
+          '<div></div\t>',
+          '<div></div\n>',
+          '<div></div \t\n>',
+          '< \t\ndiv \t\n></div>',
+        ],
+        tree: {
+          name: 'div',
+          type: 'element',
+        },
+      },
+
+      // Tag with closing tag and self-closing child (no atttributes)
+      {
+        inputs: [
+          '<div><input/></div>',
+          '< div><input/></div>',
+          '<\tdiv><input/></div>',
+          '<\ndiv><input/></div>',
+          '<div ><input/></div>',
+          '<div\t><input/></div>',
+          '<div\n><input/></div>',
+          '<div \t\n><input/></div>',
+          '<div>< input/></div>',
+          '<div><\tinput/></div>',
+          '<div><\ninput/></div>',
+          '<div>< \t\ninput/></div>',
+          '<div><input /></div>',
+          '<div><input\t/></div>',
+          '<div><input\n/></div>',
+          '<div><input \t\n/></div>',
+          '<div><input/>< /div>',
+          '<div><input/><\t/div>',
+          '<div><input/><\n/div>',
+          '<div><input/>< \t\n/div>',
+          '<div><input/></ div>',
+          '<div><input/></\tdiv>',
+          '<div><input/></\ndiv>',
+          '<div><input/></ \t\ndiv>',
+          '<div><input/></div >',
+          '<div><input/></div\t>',
+          '<div><input/></div\n>',
+          '<div><input/></div \t\n>',
+        ],
+        tree: {
+          children: [
+            {
+              name: 'input',
+              type: 'element',
+            },
+          ],
+          name: 'div',
+          type: 'element',
+        },
+      },
+    ]
+      .forEach(({inputs, tree}) => {
+        inputs.forEach((input) => {
+          it(esc(input), () => {
+            expect(parse(input)).toEqual(tree)
+          })
+        })
+      })
+  })
+})

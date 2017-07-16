@@ -15,6 +15,10 @@ type Props = {
   page?: PageType,
 }
 
+function normalizedContent (content: string) {
+  return content
+}
+
 class Page extends React.Component<void, Props, void> {
   props: Props
 
@@ -30,7 +34,7 @@ class Page extends React.Component<void, Props, void> {
 
   _renderLoadedState (page: PageType) {
     const {content, title} = page
-    const contentObject = {__html: content.rendered}
+    const contentObject = {__html: normalizedContent(content.rendered)}
 
     return [
       <h2 key="title">{title.rendered}</h2>,

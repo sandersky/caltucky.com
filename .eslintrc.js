@@ -1,7 +1,10 @@
 module.exports = {
   extends: 'standard',
   globals: {
+    describe: false,
+    expect: false,
     fetch: false,
+    it: false,
   },
   parser: 'babel-eslint',
   parserOptions: {
