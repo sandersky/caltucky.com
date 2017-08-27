@@ -133,7 +133,6 @@ describe('parser', () => {
       },
 
       // Self closing tag with attribute with value in single quotes
-
       {
         inputs: [
           "<input value='test'/>",
