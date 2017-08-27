@@ -16,7 +16,7 @@
     "react-dom": "16.0.0-beta.5",
     "react-redux": "5.0.6",
     "react-router-dom": "4.2.2",
-    "redux": "3.7.1",
+    "redux": "3.7.2",
     "redux-thunk": "2.2.0"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
     "css-loader": "0.28.5",
     "eslint": "4.5.0",
     "eslint-config-standard": "10.2.1",
-    "eslint-plugin-flowtype": "2.34.1",
+    "eslint-plugin-flowtype": "2.35.0",
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-node": "5.1.1",
     "eslint-plugin-promise": "3.5.0",
