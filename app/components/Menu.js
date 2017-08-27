@@ -20,10 +20,8 @@ type Props = {
 
 const SEARCH_DEBOUNCE = 250
 
-class Menu extends React.Component<void, Props, void> {
-  props: Props
-
-  _handleSearchKeyUp (event: SyntheticKeyboardEvent) {
+class Menu extends React.Component<Props, void> {
+  _handleSearchKeyUp (event: SyntheticKeyboardEvent<*>) {
     const element = event.currentTarget
 
     if (element instanceof HTMLInputElement) {

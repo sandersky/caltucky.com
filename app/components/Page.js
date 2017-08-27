@@ -21,9 +21,7 @@ function normalizedContent (content: string) {
   return content
 }
 
-class Page extends React.Component<void, Props, void> {
-  props: Props
-
+class Page extends React.Component<Props, void> {
   componentWillMount () {
     if (!this.props.page) {
       this.props.loadPage(this.props.match.params.slug)

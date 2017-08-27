@@ -15,9 +15,7 @@ type Props = {
   post?: PostType,
 }
 
-class Post extends React.Component<void, Props, void> {
-  props: Props
-
+class Post extends React.Component<Props, void> {
   componentWillMount () {
     if (!this.props.post) {
       this.props.loadPost(this.props.match.params.slug)

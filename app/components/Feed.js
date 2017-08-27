@@ -21,10 +21,9 @@ const FEED_POST_MARGIN = 10
 const FEED_POST_WIDTH = 200
 const SCROLL_BUFFER = 100
 
-class Feed extends React.Component<void, Props, void> {
+class Feed extends React.Component<Props, void> {
   _element: HTMLElement
   _isLoadingPosts: boolean
-  props: Props
 
   componentDidMount () {
     this._isLoadingPosts = true
@@ -77,7 +76,7 @@ class Feed extends React.Component<void, Props, void> {
     return cols * rows
   }
 
-  _handlePostKeyUp (id: number, event: SyntheticKeyboardEvent) {
+  _handlePostKeyUp (id: number, event: SyntheticKeyboardEvent<*>) {
     switch (event.keyCode) {
       case ARROW_DOWN: {
         // TODO: focus on post below current post
@@ -103,7 +102,7 @@ class Feed extends React.Component<void, Props, void> {
     }
   }
 
-  _handleScroll (event: SyntheticUIEvent) {
+  _handleScroll (event: SyntheticUIEvent<*>) {
     const element = event.currentTarget
 
     if (element instanceof HTMLElement) {
@@ -161,7 +160,11 @@ class Feed extends React.Component<void, Props, void> {
       <div
         className="Feed"
         onScroll={this._handleScroll.bind(this)}
-        ref={(el) => this._element = el}
+        ref={(el) => {
+          if (el) {
+            this._element = el
+          }
+        }}
       >
         {child}
       </div>

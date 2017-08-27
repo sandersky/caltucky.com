@@ -18,13 +18,9 @@ type State = {
   entered: boolean,
 }
 
-class Fade extends React.Component {
-  props: Props
-  state: State
-
+class Fade extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-
     this.state = {
       entered: false,
     }

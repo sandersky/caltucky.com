@@ -6,8 +6,8 @@ import React from 'react'
 
 export type SetTimeout = (callback: Function, internval: number) => number
 
-export default (Component: ReactClass<*>) => {
-  class WrappedComponent extends React.Component {
+export default (Component: React$ComponentType<*>) => {
+  class WrappedComponent extends React.Component<*, void> {
     _timeouts: Array<number>
 
     constructor () {
