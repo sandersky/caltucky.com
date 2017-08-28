@@ -17,8 +17,12 @@ const PORT = 3000
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
-function prerender (data) {
-  const history = createMemoryHistory() // TODO: seed history with initial location
+function prerender (path, data) {
+  const history = createMemoryHistory({
+    initialEntries: [path],
+    initialIndex: 0,
+  })
+
   const promises = []
 
   if (data.posts) {
@@ -34,7 +38,7 @@ function prerender (data) {
         )
         .replace(
           '<!-- render here -->',
-          renderToString(React.createElement(App, {history}))
+          renderToString(React.createElement(App, {history, ssr: true}))
         )
     })
 }
@@ -75,13 +79,13 @@ app.use('/styles.css*', assetProxy)
 
 app.get('/', (req, res) => {
   blog.posts()
-    .then((posts) => prerender({posts}))
+    .then((posts) => prerender(req.url, {posts}))
     .then((data) => res.send(data))
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
   blog.posts({slug: req.params.post})
-    .then((posts) => prerender({posts}))
+    .then((posts) => prerender(req.url, {posts}))
     .then((data) => res.send(data))
 })
 

@@ -5,6 +5,7 @@
 import React from 'react'
 
 import timer, {type SetTimeout} from '../../lib/timer'
+import ssr from '../../lib/ssr'
 // $FlowFixMe
 import './FadeAndRotate.scss'
 
@@ -27,7 +28,13 @@ class Fade extends React.Component<Props, State> {
   }
 
   _getTransitionClassName () {
-    return this.state.entered ? 'fade entered' : 'fade entering'
+    // Note: we don't want the animation for server-side rendered DOM in case
+    // a search engine determines if the DOM is visible or not without
+    // executing Javascript. This also makes SSR useful for browsers with
+    // Javascript turned off.
+    return this.props.ssr || this.state.entered
+      ? 'fade entered'
+      : 'fade entering'
   }
 
   componentDidMount () {
@@ -47,8 +54,9 @@ class Fade extends React.Component<Props, State> {
       props.className = transitionClassName
     }
 
-    // Make sure we omit properties specific to this React component
-    ;['setTimeout', 'tagName'].forEach((key) => {
+    // Make sure we omit properties specific to this React component as well as
+    // contextual properties that are invalid on an HTML tag
+    ;['setTimeout', 'ssr', 'tagName'].forEach((key) => {
       delete props[key]
     })
 
@@ -60,4 +68,4 @@ class Fade extends React.Component<Props, State> {
   }
 }
 
-export default timer(Fade)
+export default timer(ssr(Fade))
