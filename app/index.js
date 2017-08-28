@@ -3,6 +3,7 @@
  */
 
 import React from 'react'
+// $FlowFixMe - flow doesn't know about hydrate method
 import {hydrate, render} from 'react-dom'
 
 import App from './App'
