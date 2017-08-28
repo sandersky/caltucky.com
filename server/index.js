@@ -6,7 +6,7 @@ const path = require('path')
 const React = require('react')
 const {renderToString} = require('react-dom/cjs/react-dom-server.node.development')
 
-const {addPosts} = require('./app/actions/blog')
+const {addPages, addPosts} = require('./app/actions/blog')
 const App = require('./app/App').default
 const blog = require('./app/actions/wordpress').default
 
@@ -24,6 +24,10 @@ function prerender (path, data) {
   })
 
   const promises = []
+
+  if (data.pages) {
+    promises.push(global._store.dispatch(addPages(data.pages)))
+  }
 
   if (data.posts) {
     promises.push(global._store.dispatch(addPosts(data.posts)))
@@ -84,13 +88,15 @@ app.get('/', (req, res) => {
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
-  blog.posts({slug: req.params.post})
+  blog.posts({slug: req.params.slug})
     .then((posts) => prerender(req.url, {posts}))
     .then((data) => res.send(data))
 })
 
 app.get('/:slug', (req, res) => {
-  res.send(TEMPLATE)
+  blog.pages({slug: req.params.slug})
+    .then((pages) => prerender(req.url, {pages}))
+    .then((data) => res.send(data))
 })
 
 app.listen(PORT, () => {
