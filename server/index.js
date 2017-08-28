@@ -43,7 +43,7 @@ function prerender (req, res, data) {
 
       const [beforeReactDOM, afterReactDOM] = templateWithData.split('<!-- render here -->')
 
-      res.write(beforeReactDOM)
+      res.write(beforeReactDOM.replace(/\s*$/, ''))
 
       return new Promise((resolve, reject) => {
         const stream = renderToStream(React.createElement(App, {history, ssr: true}))
@@ -53,12 +53,12 @@ function prerender (req, res, data) {
         })
 
         stream.on('end', () => {
-          res.write(afterReactDOM)
+          res.write(afterReactDOM.replace(/^\s*/, ''))
           resolve()
         })
 
         stream.on('error', (err) => {
-          res.write(afterReactDOM)
+          res.write(afterReactDOM.replace(/^\s*/, ''))
           reject(err)
         })
       })
