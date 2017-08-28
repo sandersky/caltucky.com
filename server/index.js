@@ -119,4 +119,8 @@ app.get('/:slug', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Caltucky server running on port ${PORT}`)
+
+  // TODO: preload all data from API into memory so requests can just serve
+  // data from memory and not require a bunch of requests to the Wordpress
+  // servers.
 })

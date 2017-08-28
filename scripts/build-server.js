@@ -3,6 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 
+// TODO: figure out how to handle images so that they actually work properly
 function cleanupFile (filePath) {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf8', (err, data) => {
@@ -15,7 +16,7 @@ function cleanupFile (filePath) {
           .replace(/require\(('|")([^'"]+)\.(css|sass|scss)('|")\);/g, '')
           // Replace window with global so it is compliant with Node environment
           .replace(/window/g, 'global')
-          // Don't try to import image files (TODO improve this so paths still work)
+          // Don't try to import image files
           .replace(/require\(('|")([^'"]+)\.(jpeg|jpg|png)('|")\)/g, "''")
 
         fs.writeFile(filePath, data, (err) => {
