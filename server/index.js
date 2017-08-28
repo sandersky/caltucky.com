@@ -4,7 +4,7 @@ const fs = require('fs')
 const createMemoryHistory = require('history/createMemoryHistory').default
 const path = require('path')
 const React = require('react')
-const {renderToString} = require('react-dom/cjs/react-dom-server.node.development')
+const {renderToStream} = require('react-dom/cjs/react-dom-server.node.development')
 
 const {addPages, addPosts} = require('./app/actions/blog')
 const App = require('./app/App').default
@@ -17,9 +17,9 @@ const PORT = 3000
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
-function prerender (path, data) {
+function prerender (req, res, data) {
   const history = createMemoryHistory({
-    initialEntries: [path],
+    initialEntries: [req.baseUrl],
     initialIndex: 0,
   })
 
@@ -35,15 +35,33 @@ function prerender (path, data) {
 
   return Promise.all(promises)
     .then(() => {
-      return TEMPLATE
+      const templateWithData = TEMPLATE
         .replace(
           '<body>',
           `<body><script>window._data = ${stringify(data)}</script>`
         )
-        .replace(
-          '<!-- render here -->',
-          renderToString(React.createElement(App, {history, ssr: true}))
-        )
+
+      const [beforeReactDOM, afterReactDOM] = templateWithData.split('<!-- render here -->')
+
+      res.write(beforeReactDOM)
+
+      return new Promise((resolve, reject) => {
+        const stream = renderToStream(React.createElement(App, {history, ssr: true}))
+
+        stream.on('data', (chunk) => {
+          res.write(chunk)
+        })
+
+        stream.on('end', () => {
+          res.write(afterReactDOM)
+          resolve()
+        })
+
+        stream.on('error', (err) => {
+          res.write(afterReactDOM)
+          reject(err)
+        })
+      })
     })
 }
 
@@ -83,20 +101,20 @@ app.use('/styles.css*', assetProxy)
 
 app.get('/', (req, res) => {
   blog.posts()
-    .then((posts) => prerender(req.url, {posts}))
-    .then((data) => res.send(data))
+    .then((posts) => prerender(req, res, {posts}))
+    .then((data) => res.end())
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
   blog.posts({slug: req.params.slug})
-    .then((posts) => prerender(req.url, {posts}))
-    .then((data) => res.send(data))
+    .then((posts) => prerender(req, res, {posts}))
+    .then((data) => res.end())
 })
 
 app.get('/:slug', (req, res) => {
   blog.pages({slug: req.params.slug})
-    .then((pages) => prerender(req.url, {pages}))
-    .then((data) => res.send(data))
+    .then((pages) => prerender(req, res, {pages}))
+    .then((data) => res.end())
 })
 
 app.listen(PORT, () => {
