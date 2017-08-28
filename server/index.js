@@ -17,7 +17,7 @@ const PORT = 3000
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
-function prerender (req, res, data) {
+function render (req, res, data) {
   const history = createMemoryHistory({
     initialEntries: [req.baseUrl],
     initialIndex: 0,
@@ -101,19 +101,19 @@ app.use('/styles.css*', assetProxy)
 
 app.get('/', (req, res) => {
   blog.posts()
-    .then((posts) => prerender(req, res, {posts}))
+    .then((posts) => render(req, res, {posts}))
     .then((data) => res.end())
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
   blog.posts({slug: req.params.slug})
-    .then((posts) => prerender(req, res, {posts}))
+    .then((posts) => render(req, res, {posts}))
     .then((data) => res.end())
 })
 
 app.get('/:slug', (req, res) => {
   blog.pages({slug: req.params.slug})
-    .then((pages) => prerender(req, res, {pages}))
+    .then((pages) => render(req, res, {pages}))
     .then((data) => res.end())
 })
 
