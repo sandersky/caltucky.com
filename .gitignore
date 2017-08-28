@@ -4,3 +4,4 @@ node_modules
 public/assets
 public/bundle.js*
 public/styles.css*
+server/app/*

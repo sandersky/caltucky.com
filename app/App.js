@@ -2,9 +2,10 @@
  * @flow
  */
 
+import createBrowserHistory from 'history/createBrowserHistory'
 import React from 'react'
 import {Provider} from 'react-redux'
-import {BrowserRouter, Route, Switch} from 'react-router-dom'
+import {Router, Route, Switch} from 'react-router-dom'
 import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 
@@ -16,15 +17,21 @@ import Page from './PageRoute'
 import Post from './PostRoute'
 import appReducer from './reducers'
 
-const store = createStore(
+window._store = createStore(
   appReducer,
   applyMiddleware(thunk)
 )
 
-export default () => {
+type Props = {
+  history?: any, // TODO: add History type
+}
+
+export default (props: Props) => {
+  const history = props.history || createBrowserHistory()
+
   return (
-    <Provider store={store}>
-      <BrowserRouter>
+    <Provider store={window._store}>
+      <Router history={history}>
         <div className="App">
           <ConnectedMenu/>
           <div className="AppContentPane">
@@ -36,7 +43,7 @@ export default () => {
             </Switch>
           </div>
         </div>
-      </BrowserRouter>
+      </Router>
     </Provider>
   )
 }

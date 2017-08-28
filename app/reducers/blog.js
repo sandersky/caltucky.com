@@ -16,7 +16,7 @@ const INITIAL_STATE = {
   categories: [],
   filteredPosts: [],
   pages: [],
-  posts: [],
+  posts: (window._data && window._data.posts) || [],
   query: '',
 }
 
