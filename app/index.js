@@ -11,5 +11,6 @@ import App from './App'
 const node: ?HTMLElement = document.getElementById('root')
 const isServerSideRendered = node ? node.querySelectorAll('div').length !== 0 : false
 const renderMethod = isServerSideRendered ? hydrate : render
+const ssr = !!window._ssr
 
-renderMethod(<App/>, node)
+renderMethod(<App ssr={ssr}/>, node)

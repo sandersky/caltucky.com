@@ -15,7 +15,7 @@ import {
 const INITIAL_STATE = {
   categories: [],
   filteredPosts: [],
-  pages: [],
+  pages: (window._data && window._data.pages) || [],
   posts: (window._data && window._data.posts) || [],
   query: '',
 }

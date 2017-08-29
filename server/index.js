@@ -1,71 +1,70 @@
 const express = require('express')
 const proxy = require('express-http-proxy')
 const fs = require('fs')
-const createMemoryHistory = require('history/createMemoryHistory').default
+const {JSDOM} = require('jsdom')
 const path = require('path')
-const React = require('react')
-const {renderToStream} = require('react-dom/cjs/react-dom-server.node.development')
 
-const {addPages, addPosts} = require('./app/actions/blog')
-const App = require('./app/App').default
-const blog = require('./app/actions/wordpress').default
+const blog = require('./wordpress').default
 
 // Allow self-signed certificate for asset server
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
+const BUNDLE_PATH = path.join(__dirname, '..', 'public', 'bundle.js')
 const PORT = 3000
+const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
 function render (req, res, data) {
-  const history = createMemoryHistory({
-    initialEntries: [req.baseUrl],
-    initialIndex: 0,
-  })
+  console.info(`Server-side rendering ${req.url}`)
 
-  const promises = []
+  const [beforeReactDOM, afterReactDOM] = TEMPLATE.split('<!-- render here -->')
 
-  if (data.pages) {
-    promises.push(global._store.dispatch(addPages(data.pages)))
-  }
+  res.write(beforeReactDOM.replace(/\s*$/, ''))
 
-  if (data.posts) {
-    promises.push(global._store.dispatch(addPosts(data.posts)))
-  }
+  return new Promise((resolve, reject) => {
+    fs.readFile(BUNDLE_PATH, 'utf8', (err, code) => {
+      if (err) {
+        reject(err)
+      }
 
-  return Promise.all(promises)
-    .then(() => {
-      const templateWithData = TEMPLATE
-        .replace(
-          '<body>',
-          `<body><script>window._data = ${stringify(data)}</script>`
-        )
+      const scriptTagStartIndex = TEMPLATE.indexOf(SCRIPT_TAG)
+      const scriptTagEndIndex = scriptTagStartIndex + SCRIPT_TAG.length
+      const htmlUpUntilScriptTag = TEMPLATE.substr(0, scriptTagStartIndex)
 
-      const [beforeReactDOM, afterReactDOM] = templateWithData.split('<!-- render here -->')
+      const template = `
+        ${htmlUpUntilScriptTag}
+        <script>
+          window._data = ${stringify(data)};
+          window._ssr = true;
+          ${code}
+        </script>
+        ${TEMPLATE.substr(scriptTagEndIndex)}
+      `
+        .replace(/<link([^>]*)>/g, '') // We don't care about CSS in SSR
 
-      res.write(beforeReactDOM.replace(/\s*$/, ''))
+      fs.writeFileSync(path.join(__dirname, '..', 'test.html'), template)
 
-      return new Promise((resolve, reject) => {
-        const stream = renderToStream(React.createElement(App, {history, ssr: true}))
-
-        stream.on('data', (chunk) => {
-          res.write(chunk)
-        })
-
-        stream.on('end', () => {
-          res.write(afterReactDOM.replace(/^\s*/, ''))
-          resolve()
-        })
-
-        stream.on('error', (err) => {
-          res.write(afterReactDOM.replace(/^\s*/, ''))
-          reject(err)
-        })
+      const {window} = new JSDOM(template, {
+        resources: 'usable',
+        runScripts: 'dangerously',
+        url: req.headers.host + req.url,
       })
+
+      // TODO: wait until DOM is updated with posts
+      res.write(window.document.querySelector('#root').innerHTML)
+
+      res.write(afterReactDOM.replace(/^\s*/, ''))
+      resolve()
     })
+  })
 }
 
 function stringify (object) {
+  if (object === undefined) {
+    return 'undefined'
+  }
+
   if (typeof object === 'string') {
     return `'${object.replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`
   }
@@ -97,6 +96,7 @@ const assetProxy = proxy('localhost:8080', {
 
 app.use('/assets/*', assetProxy)
 app.use('/bundle.js*', assetProxy)
+app.use('/favicon.ico', assetProxy)
 app.use('/styles.css*', assetProxy)
 
 app.get('/', (req, res) => {
