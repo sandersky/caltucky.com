@@ -1,8 +1,11 @@
 const express = require('express')
 const proxy = require('express-http-proxy')
 const fs = require('fs')
-const {JSDOM} = require('jsdom')
+const createMemoryHistory = require('history/createMemoryHistory').default
 const path = require('path')
+const React = require('react')
+const {renderToStream} = require('react-dom/server')
+const {NodeVM} = require('vm2')
 
 const blog = require('./wordpress').default
 
@@ -11,9 +14,45 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const BUNDLE_PATH = path.join(__dirname, '..', 'public', 'bundle.js')
 const PORT = 3000
-const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
+
+function getLocation (req) {
+  const host = req.headers.host
+  const [hostname, port] = host.split(':')
+
+  return {
+    hash: '',
+    host,
+    hostname,
+    pathname: req.url,
+    port,
+    search: '',
+  }
+}
+
+function getSandbox (location) {
+  return {
+    _ssr: true,
+    addEventListener () {},
+    document: {
+      createElement () {
+        return {
+          style: {},
+        }
+      },
+      documentElement: {},
+      getElementById () {
+        return null
+      },
+      location,
+    },
+    location,
+    navigator: {
+      userAgent: '',
+    },
+  }
+}
 
 function render (req, res, data) {
   console.info(`Server-side rendering ${req.url}`)
@@ -28,62 +67,52 @@ function render (req, res, data) {
         reject(err)
       }
 
-      const scriptTagStartIndex = TEMPLATE.indexOf(SCRIPT_TAG)
-      const scriptTagEndIndex = scriptTagStartIndex + SCRIPT_TAG.length
-      const htmlUpUntilScriptTag = TEMPLATE.substr(0, scriptTagStartIndex)
+      const location = getLocation(req)
+      const sandbox = getSandbox(location)
 
-      const template = `
-        ${htmlUpUntilScriptTag}
-        <script>
-          window._data = ${stringify(data)};
-          window._ssr = true;
-          ${code}
-        </script>
-        ${TEMPLATE.substr(scriptTagEndIndex)}
-      `
-        .replace(/<link([^>]*)>/g, '') // We don't care about CSS in SSR
+      sandbox.window = sandbox
 
-      fs.writeFileSync(path.join(__dirname, '..', 'test.html'), template)
-
-      const {window} = new JSDOM(template, {
-        resources: 'usable',
-        runScripts: 'dangerously',
-        url: req.headers.host + req.url,
+      const vm = new NodeVM({
+        sandbox,
       })
 
-      // TODO: wait until DOM is updated with posts
-      res.write(window.document.querySelector('#root').innerHTML)
+      let state
 
-      res.write(afterReactDOM.replace(/^\s*/, ''))
-      resolve()
+      try {
+        vm.run(code)
+
+        state = sandbox.getApp({
+          data,
+          history: createMemoryHistory({
+            initialEntries: [location.pathname + location.search],
+            initialIndex: 0,
+          }),
+        })
+      } catch (err) {
+        console.error(err)
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+        return
+      }
+
+      const stream = renderToStream(React.createElement(state.Component, state.props))
+
+      stream.on('data', (chunk) => {
+        res.write(chunk)
+      })
+
+      stream.on('end', () => {
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+      })
+
+      stream.on('error', (err) => {
+        console.error(err)
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+      })
     })
   })
-}
-
-function stringify (object) {
-  if (object === undefined) {
-    return 'undefined'
-  }
-
-  if (typeof object === 'string') {
-    return `'${object.replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`
-  }
-
-  if (object instanceof Date) {
-    return `new Date('${object}')`
-  }
-
-  if (Array.isArray(object)) {
-    return '[' + object.map((item) => stringify(item)).join(',') + ']'
-  }
-
-  if (typeof object === 'object') {
-    return '{' + Object.keys(object).map((key) => {
-      return `'${key}':${stringify(object[key])}`
-    }).join(',') + '}'
-  }
-
-  return object.toString()
 }
 
 const app = express()

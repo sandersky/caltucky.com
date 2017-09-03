@@ -48,11 +48,11 @@
     "flow-bin": "0.53.1",
     "gh-pages": "1.0.0",
     "jest-cli": "20.0.4",
-    "jsdom": "11.2.0",
     "node-fetch": "1.7.2",
     "node-sass": "4.5.3",
     "sass-loader": "6.0.6",
     "uglifyjs-webpack-plugin": "0.4.6",
+    "vm2": "^3.5.0",
     "webpack": "3.5.5",
     "webpack-dev-server": "2.7.1"
   }
