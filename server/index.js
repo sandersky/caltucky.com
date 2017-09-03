@@ -1,8 +1,11 @@
 const express = require('express')
 const proxy = require('express-http-proxy')
 const fs = require('fs')
+const createMemoryHistory = require('history/createMemoryHistory').default
 const {JSDOM} = require('jsdom')
 const path = require('path')
+const React = require('react')
+const {renderToStream} = require('react-dom/server')
 
 const blog = require('./wordpress').default
 
@@ -14,6 +17,20 @@ const PORT = 3000
 const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
+
+function getLocation (req) {
+  const host = req.headers.host
+  const [hostname, port] = host.split(':')
+
+  return {
+    hash: '',
+    host,
+    hostname,
+    pathname: req.url,
+    port,
+    search: '',
+  }
+}
 
 function render (req, res, data) {
   console.info(`Server-side rendering ${req.url}`)
@@ -43,19 +60,49 @@ function render (req, res, data) {
       `
         .replace(/<link([^>]*)>/g, '') // We don't care about CSS in SSR
 
-      fs.writeFileSync(path.join(__dirname, '..', 'test.html'), template)
-
       const {window} = new JSDOM(template, {
         resources: 'usable',
         runScripts: 'dangerously',
         url: req.headers.host + req.url,
       })
 
-      // TODO: wait until DOM is updated with posts
-      res.write(window.document.querySelector('#root').innerHTML)
+      let state
 
-      res.write(afterReactDOM.replace(/^\s*/, ''))
-      resolve()
+      try {
+        const location = getLocation(req)
+
+        state = window.getApp({
+          data,
+          history: createMemoryHistory({
+            initialEntries: [location.pathname + location.search],
+            initialIndex: 0,
+          }),
+        })
+      } catch (err) {
+        console.error(err)
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+        return
+      }
+
+      const stream = renderToStream(
+        React.createElement(state.Component, state.props)
+      )
+
+      stream.on('data', (chunk) => {
+        res.write(chunk)
+      })
+
+      stream.on('end', () => {
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+      })
+
+      stream.on('error', (err) => {
+        console.error(err)
+        res.write(afterReactDOM.replace(/^\s*/, ''))
+        resolve()
+      })
     })
   })
 }

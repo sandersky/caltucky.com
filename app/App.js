@@ -2,7 +2,6 @@
  * @flow
  */
 
-import createBrowserHistory from 'history/createBrowserHistory'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Provider} from 'react-redux'
@@ -28,27 +27,13 @@ type Props = {
   ssr?: boolean,
 }
 
-type State = {
-  history: any, // TODO: add History type
-}
-
-class App extends React.Component<Props, State> {
+class App extends React.Component<Props, void> {
   static childContextTypes = {
     ssr: PropTypes.bool,
   }
 
   static defaultProps = {
     ssr: false,
-  }
-
-  constructor (props: Props) {
-    super(props)
-
-    this.state = {
-      // Note: this can't be in defaultProps or it'll break the Node enviromnent
-      // for server-side rendering because it'll still execute.
-      history: this.props.history || createBrowserHistory(),
-    }
   }
 
   getChildContext () {
@@ -60,7 +45,7 @@ class App extends React.Component<Props, State> {
   render () {
     return (
       <Provider store={window._store}>
-        <Router history={this.state.history}>
+        <Router history={this.props.history}>
           <div className="App">
             <ConnectedMenu/>
             <div className="AppContentPane">

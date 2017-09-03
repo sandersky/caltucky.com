@@ -33,7 +33,7 @@ export type PostOptions = {
 const WORDPRESS_ENDPOINT =
   'https://public-api.wordpress.com/wp/v2/sites/caltucky.com'
 
-function fetchData (path: string, params?: {[string]: any}) {
+function fetchData (path: string, params?: {[string]: any}): Object {
   let url = `${WORDPRESS_ENDPOINT}/${path}`
 
   if (params) {

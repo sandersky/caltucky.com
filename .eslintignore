@@ -1,2 +1,2 @@
 public/**/*.js
-server/app/**/*.js
+server/wordpress.js
