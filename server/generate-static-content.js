@@ -1,31 +1,13 @@
 #! /usr/bin/env node
 
-const fs = require('fs')
-const path = require('path')
-
 const blog = require('./wordpress').default
-const render = require('./renderer')
+
+const {
+  generatePageContent,
+  generatePostContent,
+} = require('./utils')
 
 const needsRendered = []
-
-function createFileStream (filePath) {
-  const dirPath = path.dirname(filePath)
-  ensureDirectory(dirPath)
-  return fs.createWriteStream(filePath)
-}
-
-function ensureDirectory (dirPath) {
-  const segments = dirPath.split(path.sep)
-
-  // NOTE: we start at index 1 because the first segment is an empty string
-  for (let i = 1; i < segments.length; i++) {
-    const segmentPath = segments.slice(0, i + 1).join(path.sep)
-
-    if (!fs.existsSync(segmentPath)) {
-      fs.mkdirSync(segmentPath)
-    }
-  }
-}
 
 function fetchPages (options) {
   return blog.pages({...options, order: 'asc', orderby: 'date'})
@@ -55,40 +37,6 @@ function fetchPosts (options) {
         })
       }
     })
-}
-
-function generatePageContent (page) {
-  const filePath = path.join(__dirname, '..', 'public', `${page.slug}.html`)
-
-  const req = {
-    headers: {
-      host: 'caltucky.com:8080',
-    },
-    url: `/${page.slug}`,
-  }
-
-  const writeStream = createFileStream(filePath)
-
-  return render(req, writeStream, {pages: [page]})
-}
-
-function generatePostContent (post) {
-  const [year, month, day] = post.date_gmt.toISOString().split(/[-T]/)
-
-  const filePath = path.join(
-    __dirname, '..', 'public', year, month, day, `${post.slug}.html`
-  )
-
-  const req = {
-    headers: {
-      host: 'caltucky.com:8080',
-    },
-    url: `/${year}/${month}/${day}/${post.slug}`,
-  }
-
-  const writeStream = createFileStream(filePath)
-
-  return render(req, writeStream, {posts: [post]})
 }
 
 function renderItem () {

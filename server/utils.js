@@ -10,6 +10,59 @@ const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
+function createFileStream (filePath) {
+  const dirPath = path.dirname(filePath)
+  ensureDirectory(dirPath)
+  return fs.createWriteStream(filePath)
+}
+
+function ensureDirectory (dirPath) {
+  const segments = dirPath.split(path.sep)
+
+  // NOTE: we start at index 1 because the first segment is an empty string
+  for (let i = 1; i < segments.length; i++) {
+    const segmentPath = segments.slice(0, i + 1).join(path.sep)
+
+    if (!fs.existsSync(segmentPath)) {
+      fs.mkdirSync(segmentPath)
+    }
+  }
+}
+
+function generatePageContent (page) {
+  const filePath = path.join(__dirname, '..', 'public', `${page.slug}.html`)
+
+  const req = {
+    headers: {
+      host: 'caltucky.com:8080',
+    },
+    url: `/${page.slug}`,
+  }
+
+  const writeStream = createFileStream(filePath)
+
+  return render(req, writeStream, {pages: [page]})
+}
+
+function generatePostContent (post) {
+  const [year, month, day] = post.date_gmt.toISOString().split(/[-T]/)
+
+  const filePath = path.join(
+    __dirname, '..', 'public', year, month, day, `${post.slug}.html`
+  )
+
+  const req = {
+    headers: {
+      host: 'caltucky.com:8080',
+    },
+    url: `/${year}/${month}/${day}/${post.slug}`,
+  }
+
+  const writeStream = createFileStream(filePath)
+
+  return render(req, writeStream, {posts: [post]})
+}
+
 function getLocation (req) {
   const host = req.headers.host
   const [hostname, port] = host.split(':')
@@ -24,33 +77,11 @@ function getLocation (req) {
   }
 }
 
-function stringify (object) {
-  if (object === undefined) {
-    return 'undefined'
-  }
-
-  if (typeof object === 'string') {
-    return `'${object.replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`
-  }
-
-  if (object instanceof Date) {
-    return `new Date('${object}')`
-  }
-
-  if (Array.isArray(object)) {
-    return '[' + object.map((item) => stringify(item)).join(',') + ']'
-  }
-
-  if (typeof object === 'object') {
-    return '{' + Object.keys(object).map((key) => {
-      return `'${key}':${stringify(object[key])}`
-    }).join(',') + '}'
-  }
-
-  return object.toString()
+function getTemplate () {
+  return TEMPLATE
 }
 
-module.exports = (req, res, data) => {
+function render (req, res, data) {
   console.info(`Server-side rendering ${req.url}`)
 
   const [beforeReactDOM, afterReactDOM] = TEMPLATE.split('<!-- render here -->')
@@ -123,4 +154,37 @@ module.exports = (req, res, data) => {
       })
     })
   })
+}
+
+function stringify (object) {
+  if (object === undefined) {
+    return 'undefined'
+  }
+
+  if (typeof object === 'string') {
+    return `'${object.replace(/'/g, "\\'").replace(/\n/g, '\\n')}'`
+  }
+
+  if (object instanceof Date) {
+    return `new Date('${object}')`
+  }
+
+  if (Array.isArray(object)) {
+    return '[' + object.map((item) => stringify(item)).join(',') + ']'
+  }
+
+  if (typeof object === 'object') {
+    return '{' + Object.keys(object).map((key) => {
+      return `'${key}':${stringify(object[key])}`
+    }).join(',') + '}'
+  }
+
+  return object.toString()
+}
+
+module.exports = {
+  generatePageContent,
+  generatePostContent,
+  getTemplate,
+  render,
 }

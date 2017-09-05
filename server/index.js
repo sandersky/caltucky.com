@@ -6,7 +6,13 @@ const proxy = require('express-http-proxy')
 const path = require('path')
 
 const blog = require('./wordpress').default
-const render = require('./renderer')
+
+const {
+  generatePageContent,
+  generatePostContent,
+  getTemplate,
+  render,
+} = require('./utils')
 
 // Allow self-signed certificate for asset server
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -17,7 +23,8 @@ function doesFileExist (filePath) {
   return new Promise((resolve, reject) => {
     fs.stat(filePath, (err, stats) => {
       if (err) {
-        resolve(false)
+        reject(new Error('file not found'))
+        return
       }
 
       resolve(stats.isFile())
@@ -45,23 +52,52 @@ app.get('/', (req, res) => {
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
+  const {day, month, slug, year} = req.params
+
   const filePath = path.join(
-    __dirname, 'content', 'posts', `${req.params.slug}.html`
+    __dirname, '..', 'public', year, month, day, `${slug}.html`
   )
 
   doesFileExist(filePath)
-    .catch() // Create file
-    .then() // Return file contents as res
+    .catch(() => {
+      return blog.posts({slug}).then((posts) => {
+        return generatePostContent(posts[0])
+      })
+    })
+    .then(() => {
+      fs.readFile(filePath, (err, contents) => {
+        if (err) {
+          res.write(getTemplate())
+        } else {
+          res.write(contents)
+        }
+
+        res.end()
+      })
+    })
 })
 
 app.get('/:slug', (req, res) => {
-  const filePath = path.join(
-    __dirname, 'content', 'pages', `${req.params.slug}.html`
-  )
+  const {slug} = req.params
+  const filePath = path.join(__dirname, '..', 'public', `${slug}.html`)
 
   doesFileExist(filePath)
-    .catch() // Create file
-    .then() // Return file contents as res
+    .catch(() => {
+      return blog.pages({slug}).then((pages) => {
+        return generatePageContent(pages[0])
+      })
+    })
+    .then(() => {
+      fs.readFile(filePath, (err, contents) => {
+        if (err) {
+          res.write(getTemplate())
+        } else {
+          res.write(contents)
+        }
+
+        res.end()
+      })
+    })
 })
 
 app.listen(PORT, () => {
