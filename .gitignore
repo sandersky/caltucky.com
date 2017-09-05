@@ -1,7 +1,5 @@
 .DS_Store
 npm-debug.log
 node_modules
-public/assets
-public/bundle.js*
-public/styles.css*
+public/*
 server/wordpress.js
