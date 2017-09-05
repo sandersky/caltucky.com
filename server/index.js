@@ -60,20 +60,33 @@ app.get('/:year/:month/:day/:slug', (req, res) => {
 
   doesFileExist(filePath)
     .catch(() => {
-      return blog.posts({slug}).then((posts) => {
-        return generatePostContent(posts[0])
+      return blog.posts({slug: encodeURIComponent(slug)}).then((posts) => {
+        if (posts.length === 0) {
+          console.error(`Post not found with slug: ${slug}`)
+          res.write(getTemplate())
+        } else {
+          console.info('Generating post contents')
+          return generatePostContent(posts[0])
+        }
       })
     })
     .then(() => {
-      fs.readFile(filePath, (err, contents) => {
-        if (err) {
-          res.write(getTemplate())
-        } else {
-          res.write(contents)
-        }
+      return new Promise((resolve) => {
+        fs.readFile(filePath, (err, contents) => {
+          if (err) {
+            console.error(`Failed to read file contents for file: ${filePath}`)
+            res.write(getTemplate())
+          } else {
+            console.info('Rendering post from cache')
+            res.write(contents)
+          }
 
-        res.end()
+          resolve()
+        })
       })
+    })
+    .then(() => {
+      res.end()
     })
 })
 
@@ -83,20 +96,33 @@ app.get('/:slug', (req, res) => {
 
   doesFileExist(filePath)
     .catch(() => {
-      return blog.pages({slug}).then((pages) => {
-        return generatePageContent(pages[0])
+      return blog.pages({slug: encodeURIComponent(slug)}).then((pages) => {
+        if (pages.length === 0) {
+          console.error(`Page not found with slug: ${slug}`)
+          res.write(getTemplate())
+        } else {
+          console.info('Generating page contents')
+          return generatePageContent(pages[0])
+        }
       })
     })
     .then(() => {
-      fs.readFile(filePath, (err, contents) => {
-        if (err) {
-          res.write(getTemplate())
-        } else {
-          res.write(contents)
-        }
+      return new Promise((resolve) => {
+        fs.readFile(filePath, (err, contents) => {
+          if (err) {
+            console.error(`Failed to read file contents for file: ${filePath}`)
+            res.write(getTemplate())
+          } else {
+            console.info('Rendering page from cache')
+            res.write(contents)
+          }
 
-        res.end()
+          resolve()
+        })
       })
+    })
+    .then(() => {
+      res.end()
     })
 })
 

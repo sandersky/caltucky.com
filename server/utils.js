@@ -30,7 +30,9 @@ function ensureDirectory (dirPath) {
 }
 
 function generatePageContent (page) {
-  const filePath = path.join(__dirname, '..', 'public', `${page.slug}.html`)
+  const filePath = path.join(
+    __dirname, '..', 'public', `${decodeURIComponent(page.slug)}.html`
+  )
 
   const req = {
     headers: {
@@ -48,7 +50,7 @@ function generatePostContent (post) {
   const [year, month, day] = post.date_gmt.toISOString().split(/[-T]/)
 
   const filePath = path.join(
-    __dirname, '..', 'public', year, month, day, `${post.slug}.html`
+    __dirname, '..', 'public', year, month, day, `${decodeURIComponent(post.slug)}.html`
   )
 
   const req = {
