@@ -1,13 +1,19 @@
 const WHITESPACE = /\s/
 
 export function parse (content: string) {
-  let attributeName, closingQuote, currentNode, isClosingTag,
+  let attributeName, closingQuote, currentNode, escapeNextChar, isClosingTag,
     parsingAttributeValue, parsingElement, parsingElementName, tree
 
   let buffer = []
 
   for (let i = 0, len = content.length; i < len; i++) {
     const c = content[i]
+
+    if (escapeNextChar) {
+      escapeNextChar = false
+      buffer.push(c)
+      continue
+    }
 
     switch (c) {
       case '<': {
@@ -86,6 +92,11 @@ export function parse (content: string) {
           buffer = []
         }
 
+        break
+      }
+
+      case '\\': {
+        escapeNextChar = true
         break
       }
 
