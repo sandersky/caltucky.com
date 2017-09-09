@@ -265,6 +265,49 @@ describe('parser', () => {
         },
       },
 
+      // Tag with text contents
+      {
+        inputs: [
+          '<label>Foo</label>',
+          '<label> Foo</label>',
+          '<label>\tFoo</label>',
+          '<label>\nFoo</label>',
+          '<label> \t\nFoo</label>',
+          '<label>Foo </label>',
+          '<label>Foo\t</label>',
+          '<label>Foo\n</label>',
+          '<label>Foo \t\n</label>',
+          '<label> \t\nFoo \t\n</label>',
+        ],
+        tree: {
+          children: [
+            {
+              text: 'Foo',
+              type: 'text',
+            },
+          ],
+          name: 'label',
+          type: 'element',
+        },
+      },
+
+      // Pre tag preserves whitespace
+      {
+        inputs: [
+          '<pre>\n\t foo \t\nbar \t\n</pre>',
+        ],
+        tree: {
+          children: [
+            {
+              text: '\n\t foo \t\nbar \t\n',
+              type: 'text',
+            },
+          ],
+          name: 'pre',
+          type: 'element',
+        },
+      },
+
       // Tag with closing tag and self-closing child (no atttributes)
       {
         inputs: [

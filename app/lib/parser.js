@@ -19,9 +19,30 @@ export function parse (content: string) {
     switch (c) {
       case '<': {
         if (buffer.length) {
-          tree = {
+          const textNode = {
             text: buffer.join(''),
             type: 'text',
+          }
+
+          if (!currentNode) {
+            tree = textNode
+          } else if (['comment', 'text'].indexOf(currentNode.type) !== -1) {
+            currentNode = {
+              children: [
+                currentNode,
+                textNode,
+              ],
+            }
+          } else {
+            if (!Array.isArray(currentNode.children)) {
+              currentNode.children = []
+            }
+
+            if (currentNode.type === 'element' && currentNode.name !== 'pre') {
+              textNode.text = textNode.text.trim()
+            }
+
+            currentNode.children.push(textNode)
           }
         }
 
@@ -174,7 +195,17 @@ export function parse (content: string) {
         }
 
         if (WHITESPACE.test(c)) {
-          if (buffer.length === 0) break
+          if (buffer.length === 0) {
+            if (
+              currentNode &&
+              currentNode.type === 'element' &&
+              currentNode.name === 'pre'
+            ) {
+              buffer.push(c)
+            }
+
+            break
+          }
 
           // If this is a tag with whitespace before/after the tag name
           if (parsingElementName) {
