@@ -2,7 +2,8 @@ const WHITESPACE = /\s/
 
 export function parse (content: string) {
   let attributeName, closingQuote, currentNode, escapeNextChar, isClosingTag,
-    parsingAttributeValue, parsingElement, parsingElementName, tree
+    parsingAttributeValue, parsingComment, parsingElement, parsingElementName,
+    tree
 
   let buffer = []
 
@@ -35,10 +36,19 @@ export function parse (content: string) {
       }
 
       case '>': {
+        const len = buffer.length
+
+        const isClosingComment = (
+          parsingComment &&
+          len >= 2 &&
+          buffer[len - 2] === '-' &&
+          buffer[len - 1] === '-'
+        )
+
         if (!tree) {
           tree = currentNode
         } else if (!isClosingTag && tree) {
-          if (tree.type === 'text') {
+          if (['comment', 'text'].indexOf(tree.type) !== -1) {
             tree = {
               children: [
                 tree,
@@ -52,6 +62,14 @@ export function parse (content: string) {
 
             tree.children.push(currentNode)
           }
+        }
+
+        if (isClosingComment) {
+          buffer.splice(len - 2, 2)
+          currentNode.comment = buffer.join('')
+          parsingComment = false
+          buffer = []
+          break
         }
 
         // If this is a tag without attributes
@@ -140,6 +158,21 @@ export function parse (content: string) {
       }
 
       default: {
+        if (
+          parsingElementName &&
+          buffer.length === 3 &&
+          buffer[0] === '!' &&
+          buffer[1] === '-' &&
+          buffer[2] === '-'
+        ) {
+          currentNode.type = 'comment'
+          parsingComment = true
+          parsingElementName = false
+          parsingElement = false
+          buffer = [c]
+          break
+        }
+
         if (WHITESPACE.test(c)) {
           if (buffer.length === 0) break
 

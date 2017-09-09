@@ -29,6 +29,49 @@ describe('parser', () => {
         },
       },
 
+      // Comments
+      {
+        inputs: [
+          '<!-- foo bar -->',
+        ],
+        tree: {
+          comment: ' foo bar ',
+          type: 'comment',
+        },
+      },
+      {
+        inputs: [
+          '<!-- foo bar -->\n<!--baz-->',
+        ],
+        tree: {
+          children: [
+            {
+              comment: ' foo bar ',
+              type: 'comment',
+            },
+            {
+              comment: 'baz',
+              type: 'comment',
+            },
+          ],
+        },
+      },
+      {
+        inputs: [
+          '<div><!-- foo bar --></div>',
+        ],
+        tree: {
+          children: [
+            {
+              comment: ' foo bar ',
+              type: 'comment',
+            },
+          ],
+          name: 'div',
+          type: 'element',
+        },
+      },
+
       // Self closing tag without attributes
       {
         inputs: [
