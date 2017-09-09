@@ -27,6 +27,16 @@ type ParseOptions = {|
   preserveWhitespace?: boolean,
 |}
 
+type ParseElementNodeAttributeResponse =
+  | {|
+      index: number,
+    |}
+  | {|
+      index: number,
+      key: string,
+      value: boolean | string,
+    |}
+
 type ParseCommentNodeResponse = {|
   index: number,
   node: ChildrenNode | CommentNode,
@@ -142,7 +152,7 @@ export function parseElementNode (
   options: ParseOptions,
 ): ParseElementNodeResponse {
   const node = {
-    attributes: [],
+    attributes: {},
     children: [],
     type: ELEMENT_TYPE,
   }
@@ -165,7 +175,7 @@ export function parseElementNode (
           node.name = buffer.join('')
         }
 
-        if (!node.attributes.length) {
+        if (!Object.keys(node.attributes).length) {
           delete node.attributes
         }
 
@@ -178,14 +188,83 @@ export function parseElementNode (
           node,
         }
       } else {
-        // TODO: parse children
+        console.info('WTH')
+        return null // TODO: parse children
       }
-    } else if (buffer.length !== 0 && WHITESPACE.test(c) && !node.name) {
-      node.name = buffer.join('')
-    } else if (!WHITESPACE.test(c)) {
+    } else if (WHITESPACE.test(c)) {
+      // Set name, now that we've finished parsing it
+      if (buffer.length) {
+        node.name = buffer.join('')
+
+      // Ignore whitespace between name/attributes/closing
+      } else {
+        continue
+      }
+
+    // Parse potential attribute since we already have name and aren't closing
+    // the current tag
+    } else if (node.name) {
+      const state = parseElementNodeAttribute(content, i, options)
+
+      if (state.key) {
+        node.attributes[state.key] = state.value
+      }
+
+      i = state.index - 1
+
+    // Append to name
+    } else {
       buffer.push(c)
     }
   }
+}
+
+export function parseElementNodeAttribute (
+  content: string,
+  start: number,
+  options: ParseOptions,
+): ?ParseElementNodeAttributeResponse {
+  const buffer = []
+  const response = {}
+
+  for (let i = start; i < content.length; i++) {
+    const c = content[i]
+
+    if (['/', '>'].indexOf(c) !== -1) {
+      // Returning boolean attribute (attribute with no value assigned)
+      if (buffer.length) {
+        return Object.assign(response, {
+          index: i,
+          key: buffer.join(''),
+          value: true,
+        })
+      }
+
+      // False alarm, no attribute here
+      return Object.assign(response, {
+        index: i,
+      })
+    } else if (WHITESPACE.test(c)) {
+      // Returning boolean attribute (attribute with no value assigned)
+      if (buffer.length) {
+        return Object.assign(response, {
+          index: ++i,
+          key: buffer.join(''),
+          value: true,
+        })
+
+      // Ignore whitespace before key
+      } else {
+        continue
+      }
+    } else {
+      buffer.push(c)
+    }
+  }
+
+  response.index = content.length + 1
+
+  return response
 }
 
 export function parseElementOrCommentNode (

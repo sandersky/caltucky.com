@@ -153,34 +153,34 @@ export function parseTests (parse) {
       },
 
       // Self closing tag with boolean attribute
-      // {
-      //   inputs: [
-      //     '<input autofocus/>',
-      //     '< input autofocus/>',
-      //     '<\tinput autofocus/>',
-      //     '<\ninput autofocus/>',
-      //     '< \t\ninput autofocus/>',
-      //     '<input  autofocus/>',
-      //     '<input\t autofocus/>',
-      //     '<input\n autofocus/>',
-      //     '<input\t\n  autofocus/>',
-      //     '<input \t\n autofocus/>',
-      //     '<input \tautofocus/>',
-      //     '<input \nautofocus/>',
-      //     '<input  \t\nautofocus/>',
-      //     '<input autofocus />',
-      //     '<input autofocus\t/>',
-      //     '<input autofocus\n/>',
-      //     '<input autofocus \t\n/>',
-      //   ],
-      //   tree: {
-      //     attributes: {
-      //       autofocus: true,
-      //     },
-      //     name: 'input',
-      //     type: 'element',
-      //   },
-      // },
+      {
+        inputs: [
+          '<input autofocus/>',
+          '< input autofocus/>',
+          '<\tinput autofocus/>',
+          '<\ninput autofocus/>',
+          '< \t\ninput autofocus/>',
+          '<input  autofocus/>',
+          '<input\t autofocus/>',
+          '<input\n autofocus/>',
+          '<input\t\n  autofocus/>',
+          '<input \t\n autofocus/>',
+          '<input \tautofocus/>',
+          '<input \nautofocus/>',
+          '<input  \t\nautofocus/>',
+          '<input autofocus />',
+          '<input autofocus\t/>',
+          '<input autofocus\n/>',
+          '<input autofocus \t\n/>',
+        ],
+        tree: {
+          attributes: {
+            autofocus: true,
+          },
+          name: 'input',
+          type: 'element',
+        },
+      },
 
       // Self closing tag with attribute with value in single quotes
       // {
