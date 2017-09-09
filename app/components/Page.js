@@ -17,7 +17,7 @@ type Props = {
 }
 
 function normalizedContent (content: string) {
-  // console.info(parse(content))
+  console.info(parse(content))
   return content
 }
 

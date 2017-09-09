@@ -6,13 +6,14 @@ export function parse (content: string) {
     tree
 
   let buffer = []
+  let parents = []
 
   for (let i = 0, len = content.length; i < len; i++) {
     const c = content[i]
 
     if (escapeNextChar) {
       escapeNextChar = false
-      buffer.push(c)
+      buffer.push('\\', c)
       continue
     }
 
@@ -47,6 +48,11 @@ export function parse (content: string) {
         }
 
         buffer = []
+
+        if (currentNode) {
+          parents.unshift(currentNode)
+        }
+
         currentNode = {
           type: 'element',
         }
@@ -87,6 +93,11 @@ export function parse (content: string) {
 
         if (isClosingComment) {
           buffer.splice(len - 2, 2)
+
+          while (WHITESPACE.test(buffer[buffer.length - 1])) {
+            buffer.pop()
+          }
+
           currentNode.comment = buffer.join('')
           parsingComment = false
           buffer = []
@@ -98,6 +109,10 @@ export function parse (content: string) {
           currentNode.name = buffer.join('')
           buffer = []
           parsingElementName = false
+        }
+
+        if (isClosingTag && parents.length) {
+          currentNode = parents.shift()
         }
 
         parsingElement = false
@@ -115,6 +130,7 @@ export function parse (content: string) {
 
           // If this is a closing tag
           } else {
+            parents.shift()
             isClosingTag = true
           }
 
@@ -190,8 +206,7 @@ export function parse (content: string) {
           parsingComment = true
           parsingElementName = false
           parsingElement = false
-          buffer = [c]
-          break
+          buffer = []
         }
 
         if (WHITESPACE.test(c)) {
