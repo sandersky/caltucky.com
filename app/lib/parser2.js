@@ -141,11 +141,16 @@ export function parseElementNode (
   start: number,
   options: ParseOptions,
 ): ParseElementNodeResponse {
+  const node = {
+    attributes: [],
+    children: [],
+    type: ELEMENT_TYPE,
+  }
   const buffer = []
   let escapeNextChar = false
   let isSelfClosing = false
 
-  for (let i = start; i < content.length; i++) {
+  for (let i = start + 1; i < content.length; i++) {
     const c = content[i]
 
     if (c === '\\' && !escapeNextChar) {
@@ -156,16 +161,29 @@ export function parseElementNode (
       isSelfClosing = true
     } else if (c === '>') {
       if (isSelfClosing) {
+        if (!node.name) {
+          node.name = buffer.join('')
+        }
+
+        if (!node.attributes.length) {
+          delete node.attributes
+        }
+
+        if (!node.children.length) {
+          delete node.children
+        }
+
         return {
-          index: i++,
-          node: {
-            name: buffer.join(''),
-            type: ELEMENT_TYPE,
-          },
+          index: ++i,
+          node,
         }
       } else {
-        // TODO: continue parsing element node
+        // TODO: parse children
       }
+    } else if (buffer.length !== 0 && WHITESPACE.test(c) && !node.name) {
+      node.name = buffer.join('')
+    } else if (!WHITESPACE.test(c)) {
+      buffer.push(c)
     }
   }
 }
