@@ -226,11 +226,18 @@ export function parseElementNodeAttribute (
 ): ?ParseElementNodeAttributeResponse {
   const buffer = []
   const response = {}
+  let escapeNextChar = false
+  let quote
 
   for (let i = start; i < content.length; i++) {
     const c = content[i]
 
-    if (['/', '>'].indexOf(c) !== -1) {
+    if (escapeNextChar) {
+      buffer.push('\\', c)
+      escapeNextChar = false
+    } else if (c === '\\') {
+      escapeNextChar = true
+    } else if (['/', '>'].indexOf(c) !== -1) {
       // Returning boolean attribute (attribute with no value assigned)
       if (buffer.length) {
         return Object.assign(response, {
@@ -244,9 +251,39 @@ export function parseElementNodeAttribute (
       return Object.assign(response, {
         index: i,
       })
+    } else if (['"', "'"].indexOf(c) !== -1) {
+      // If starting quote
+      if (!quote) {
+        if (buffer[buffer.length - 1] !== '=') {
+          const code = content.slice(start, i)
+
+          throw new Error(
+            `Missing = between key and starting quote at index ${start}: ${code}`
+          )
+        }
+
+        quote = c
+        response.key = buffer.splice(0, buffer.length - 1).join('')
+        buffer.pop() // Remove = from buffer
+
+      // If ending quote
+      } else if (quote === c) {
+        return Object.assign(response, {
+          index: ++i,
+          value: buffer.join(''),
+        })
+
+      // If not a delimeter quote
+      } else {
+        buffer.push(c)
+      }
     } else if (WHITESPACE.test(c)) {
+      // Keep whitespace in value
+      if (quote) {
+        buffer.push(c)
+
       // Returning boolean attribute (attribute with no value assigned)
-      if (buffer.length) {
+      } else if (buffer.length) {
         return Object.assign(response, {
           index: ++i,
           key: buffer.join(''),
