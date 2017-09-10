@@ -426,6 +426,39 @@ describe('parser', () => {
           ],
         },
       },
+
+      // Element with multiple attributes
+      {
+        inputs: [
+          '<div class="foo" style="color:red"></div>',
+        ],
+        tree: {
+          attributes: {
+            'class': 'foo',
+            style: 'color:red',
+          },
+          name: 'div',
+          type: 'element',
+        },
+      },
+
+      // Element with multiple attributes
+      {
+        inputs: [
+          '<img ' +
+            'data-attachment-id="37" ' +
+            'data-permalink="https://caltucky.com/about/hbgrad-32/"' +
+          '/>',
+        ],
+        tree: {
+          attributes: {
+            'data-attachment-id': '37',
+            'data-permalink': 'https://caltucky.com/about/hbgrad-32/',
+          },
+          name: 'img',
+          type: 'element',
+        },
+      },
     ]
       .forEach(({inputs, tree}) => {
         inputs.forEach((input) => {

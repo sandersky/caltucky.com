@@ -1,66 +1,20 @@
-const ELEMENT_TYPE = 'element'
-const TEXT_TYPE = 'text'
+import {
+  type ChildrenNode,
+  COMMENT_TYPE,
+  ELEMENT_TYPE,
+  type ElementNode,
+  type ParseCommentNodeResponse,
+  type ParseElementNodeAttributeResponse,
+  type ParseElementNodeResponse,
+  type ParseElementOrCommentNodeResponse,
+  type ParseNodeResponse,
+  type ParseOptions,
+  type ParseTextNodeResponse,
+  TEXT_TYPE,
+  type TextNode,
+} from './types'
+
 const WHITESPACE = /\s/
-
-type ChildrenNode = {|
-  children: Array<*>,
-  type: 'children',
-|}
-
-type CommentNode = {|
-  comment: string,
-  type: 'comment',
-|}
-
-type ElementNode = {|
-  children?: Array<*>,
-  name: string,
-  type: 'element',
-|}
-
-type TextNode = {|
-  text: string,
-  type: 'text',
-|}
-
-type ParseOptions = {|
-  preserveWhitespace?: boolean,
-|}
-
-type ParseElementNodeAttributeResponse =
-  | {|
-      index: number,
-    |}
-  | {|
-      index: number,
-      key: string,
-      value: boolean | string,
-    |}
-
-type ParseCommentNodeResponse = {|
-  index: number,
-  node: ChildrenNode | CommentNode,
-|}
-
-type ParseElementOrCommentNodeResponse = {|
-  index: number,
-  node: ChildrenNode | CommentNode | ElementNode,
-|}
-
-type ParseElementNodeResponse = {|
-  index: number,
-  node: ChildrenNode | ElementNode,
-|}
-
-type ParseNodeResponse = {|
-  index: number,
-  node: ?ChildrenNode | ElementNode | TextNode,
-|}
-
-type ParseTextNodeResponse = {|
-  index: number,
-  node: ?ChildrenNode | TextNode,
-|}
 
 export function parse (
   content: string,
@@ -162,7 +116,7 @@ export function parseCommentNode (
         index: i++,
         node: {
           comment: buffer.join(''),
-          type: 'comment',
+          type: COMMENT_TYPE,
         },
       }
     } else if (
@@ -326,7 +280,7 @@ export function parseElementNodeAttribute (
       escapeNextChar = false
     } else if (c === '\\') {
       escapeNextChar = true
-    } else if (['/', '>'].indexOf(c) !== -1) {
+    } else if (!quote && ['/', '>'].indexOf(c) !== -1) {
       // Returning boolean attribute (attribute with no value assigned)
       if (buffer.length) {
         return Object.assign(response, {
