@@ -4,6 +4,7 @@
 
 import React from 'react'
 
+import {compile} from '../lib/compiler'
 import {parse} from '../lib/parser'
 import type {Match, Page as PageType} from '../types'
 // $FlowFixMe
@@ -17,8 +18,9 @@ type Props = {
 }
 
 function normalizedContent (content: string) {
-  console.info(parse(content))
-  return content
+  const ast = parse(content)
+  // TODO: apply transforms here
+  return compile(ast)
 }
 
 class Page extends React.Component<Props, void> {

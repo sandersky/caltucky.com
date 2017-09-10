@@ -4,6 +4,8 @@
 
 import React from 'react'
 
+import {compile} from '../lib/compiler'
+import {parse} from '../lib/parser'
 import type {Match, Post as PostType} from '../types'
 // $FlowFixMe
 import './Post.scss'
@@ -13,6 +15,12 @@ type Props = {
   loadPost: (slug: string) => void,
   match: Match,
   post?: PostType,
+}
+
+function normalizedContent (content: string) {
+  const ast = parse(content)
+  // TODO: apply transforms here
+  return compile(ast)
 }
 
 class Post extends React.Component<Props, void> {
@@ -28,7 +36,7 @@ class Post extends React.Component<Props, void> {
 
   _renderLoadedState (post: PostType) {
     const {content, title} = post
-    const contentObject = {__html: content.rendered}
+    const contentObject = {__html: normalizedContent(content.rendered)}
 
     return [
       <h2 key="title">{title.rendered}</h2>,

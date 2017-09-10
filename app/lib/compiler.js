@@ -38,7 +38,7 @@ export function compileElementNode (node: ElementNode): string {
     if (keys.length) {
       attributes = ' ' + keys.map((key) => {
         const value = node.attributes[key]
-        const quote = '""' // TODO: figure out which quote to use based on value
+        const quote = '"' // TODO: figure out which quote to use based on value
         return value === true ? key : `${key}=${quote}${value}${quote}`
       })
         .join(' ')
@@ -46,7 +46,7 @@ export function compileElementNode (node: ElementNode): string {
   }
 
   if (Array.isArray(node.children) && node.children.length) {
-    children = node.children.map(compile)
+    children = node.children.map(compile).join('')
   }
 
   if (!children && SELF_CLOSING_ELEMENTS.indexOf(name) !== -1) {
