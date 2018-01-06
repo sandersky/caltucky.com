@@ -22,6 +22,11 @@ if (window._ssr) {
   }
 } else {
   const node: ?HTMLElement = document.getElementById('root')
+
+  if (!node) {
+    throw new Error('Root node not found')
+  }
+
   const history = createBrowserHistory()
   const isServerSideRendered = node ? node.querySelectorAll('div').length !== 0 : false
   const renderMethod = isServerSideRendered ? hydrate : render

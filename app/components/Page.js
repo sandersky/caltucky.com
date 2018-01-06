@@ -36,10 +36,11 @@ class Page extends React.Component<Props, void> {
 
   _renderLoadedState (page: PageType) {
     const {content, title} = page
+    const titleObject = {__html: normalizedContent(title.rendered)}
     const contentObject = {__html: normalizedContent(content.rendered)}
 
     return [
-      <h2 key="title">{title.rendered}</h2>,
+      <h2 dangerouslySetInnerHTML={titleObject} key="title" />,
       <div dangerouslySetInnerHTML={contentObject} key="content"/>,
     ]
   }

@@ -3,7 +3,7 @@ const fs = require('fs')
 const {JSDOM} = require('jsdom')
 const path = require('path')
 const React = require('react')
-const {renderToStream} = require('react-dom/server')
+const {renderToNodeStream} = require('react-dom/server')
 
 const BUNDLE_PATH = path.join(__dirname, '..', 'public', 'bundle.js')
 const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
@@ -136,7 +136,7 @@ function render (req, res, data) {
         return
       }
 
-      const stream = renderToStream(
+      const stream = renderToNodeStream(
         React.createElement(state.Component, state.props)
       )
 
