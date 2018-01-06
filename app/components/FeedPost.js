@@ -15,7 +15,7 @@ type Props = {
   width: number,
 }
 
-function getPostStyle (margin: number, width: number) {
+function getPostStyle(margin: number, width: number) {
   return {
     height: width,
     margin,
@@ -39,14 +39,14 @@ export default (props: Props) => {
   }
 
   // Make sure we omit properties specific to this React component
-  ;['margin', 'post', 'width'].forEach((key) => {
+  ;['margin', 'post', 'width'].forEach(key => {
     delete passthroughProps[key]
   })
 
   return (
     <FadeAndRotate {...passthroughProps}>
-      <h3 dangerouslySetInnerHTML={title}></h3>
-      <img alt="" src={imageSrc}/>
+      <h3 dangerouslySetInnerHTML={title} />
+      <img alt="" src={imageSrc} />
     </FadeAndRotate>
   )
 }

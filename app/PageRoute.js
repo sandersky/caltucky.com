@@ -12,13 +12,13 @@ const mapStateToProps = ({blog}, {match}) => {
 
   return {
     error: blog.pageError,
-    page: blog.pages.find((page) => page.slug === slug),
+    page: blog.pages.find(page => page.slug === slug),
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    loadPage (slug: string) {
+    loadPage(slug: string) {
       dispatch(loadPage(slug))
     },
   }

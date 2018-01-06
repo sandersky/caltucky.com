@@ -3,10 +3,11 @@
  */
 
 import React from 'react'
+import {type Match} from 'react-router-dom'
 
 import {compile} from '../lib/compiler'
 import {parse} from '../lib/parser'
-import type {Match, Page as PageType} from '../types'
+import type {Page as PageType} from '../types'
 // $FlowFixMe
 import './Page.scss'
 
@@ -17,39 +18,39 @@ type Props = {
   page?: PageType,
 }
 
-function normalizedContent (content: string) {
+function normalizedContent(content: string) {
   const ast = parse(content)
   // TODO: apply transforms here
   return compile(ast)
 }
 
 class Page extends React.Component<Props, void> {
-  componentWillMount () {
+  componentWillMount() {
     if (!this.props.page) {
       this.props.loadPage(this.props.match.params.slug)
     }
   }
 
-  _renderErrorState (error: Error) {
+  _renderErrorState(error: Error) {
     return 'An error occurred'
   }
 
-  _renderLoadedState (page: PageType) {
+  _renderLoadedState(page: PageType) {
     const {content, title} = page
     const titleObject = {__html: normalizedContent(title.rendered)}
     const contentObject = {__html: normalizedContent(content.rendered)}
 
     return [
       <h2 dangerouslySetInnerHTML={titleObject} key="title" />,
-      <div dangerouslySetInnerHTML={contentObject} key="content"/>,
+      <div dangerouslySetInnerHTML={contentObject} key="content" />,
     ]
   }
 
-  _renderLoadingState () {
+  _renderLoadingState() {
     return 'Loading page'
   }
 
-  render () {
+  render() {
     const {error, page} = this.props
 
     let child
@@ -62,11 +63,7 @@ class Page extends React.Component<Props, void> {
       child = this._renderLoadingState()
     }
 
-    return (
-      <div className="Page">
-        {child}
-      </div>
-    )
+    return <div className="Page">{child}</div>
   }
 }
 

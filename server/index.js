@@ -19,7 +19,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const PORT = 3000
 
-function doesFileExist (filePath) {
+function doesFileExist(filePath) {
   return new Promise((resolve, reject) => {
     fs.stat(filePath, (err, stats) => {
       if (err) {
@@ -35,7 +35,7 @@ function doesFileExist (filePath) {
 const app = express()
 const assetProxy = proxy('localhost:8080', {
   https: true,
-  proxyReqPathResolver (req) {
+  proxyReqPathResolver(req) {
     return req.baseUrl
   },
 })
@@ -46,21 +46,28 @@ app.use('/favicon.ico', assetProxy)
 app.use('/styles.css*', assetProxy)
 
 app.get('/', (req, res) => {
-  blog.posts()
-    .then((posts) => render(req, res, {posts}))
-    .then((data) => res.end())
+  blog
+    .posts()
+    .then(posts => render(req, res, {posts}))
+    .then(data => res.end())
 })
 
 app.get('/:year/:month/:day/:slug', (req, res) => {
   const {day, month, slug, year} = req.params
 
   const filePath = path.join(
-    __dirname, '..', 'public', year, month, day, `${slug}.html`
+    __dirname,
+    '..',
+    'public',
+    year,
+    month,
+    day,
+    `${slug}.html`,
   )
 
   doesFileExist(filePath)
     .catch(() => {
-      return blog.posts({slug: encodeURIComponent(slug)}).then((posts) => {
+      return blog.posts({slug: encodeURIComponent(slug)}).then(posts => {
         if (posts.length === 0) {
           console.error(`Post not found with slug: ${slug}`)
           res.write(getTemplate())
@@ -71,7 +78,7 @@ app.get('/:year/:month/:day/:slug', (req, res) => {
       })
     })
     .then(() => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         fs.readFile(filePath, (err, contents) => {
           if (err) {
             console.error(`Failed to read file contents for file: ${filePath}`)
@@ -96,7 +103,7 @@ app.get('/:slug', (req, res) => {
 
   doesFileExist(filePath)
     .catch(() => {
-      return blog.pages({slug: encodeURIComponent(slug)}).then((pages) => {
+      return blog.pages({slug: encodeURIComponent(slug)}).then(pages => {
         if (pages.length === 0) {
           console.error(`Page not found with slug: ${slug}`)
           res.write(getTemplate())
@@ -107,7 +114,7 @@ app.get('/:slug', (req, res) => {
       })
     })
     .then(() => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         fs.readFile(filePath, (err, contents) => {
           if (err) {
             console.error(`Failed to read file contents for file: ${filePath}`)

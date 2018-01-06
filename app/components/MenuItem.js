@@ -15,9 +15,7 @@ type Props = {
 
 export default (props: Props) => {
   const text = {__html: props.text}
-  return <Link
-    className="MenuItem"
-    dangerouslySetInnerHTML={text}
-    to={props.path}
-  />
+  return (
+    <Link className="MenuItem" dangerouslySetInnerHTML={text} to={props.path} />
+  )
 }

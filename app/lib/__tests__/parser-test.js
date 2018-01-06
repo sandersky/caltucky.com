@@ -1,9 +1,7 @@
 import {parse} from '../parser'
 
-function esc (text) {
-  return text
-    .replace(/\n/g, '\\n')
-    .replace(/\t/g, '\\t')
+function esc(text) {
+  return text.replace(/\n/g, '\\n').replace(/\t/g, '\\t')
 }
 
 describe('parser', () => {
@@ -11,27 +9,21 @@ describe('parser', () => {
     ;[
       // Text
       {
-        inputs: [
-          'Test',
-        ],
+        inputs: ['Test'],
         tree: {
           text: 'Test',
           type: 'text',
         },
       },
       {
-        inputs: [
-          'Foo bar',
-        ],
+        inputs: ['Foo bar'],
         tree: {
           text: 'Foo bar',
           type: 'text',
         },
       },
       {
-        inputs: [
-          'Foo\\< bar',
-        ],
+        inputs: ['Foo\\< bar'],
         tree: {
           text: 'Foo\\< bar',
           type: 'text',
@@ -40,18 +32,14 @@ describe('parser', () => {
 
       // Comments
       {
-        inputs: [
-          '<!-- foo bar -->',
-        ],
+        inputs: ['<!-- foo bar -->'],
         tree: {
           comment: 'foo bar',
           type: 'comment',
         },
       },
       {
-        inputs: [
-          '<!-- foo bar -->\n<!--baz-->',
-        ],
+        inputs: ['<!-- foo bar -->\n<!--baz-->'],
         tree: {
           children: [
             {
@@ -66,9 +54,7 @@ describe('parser', () => {
         },
       },
       {
-        inputs: [
-          '<div><!-- foo bar --></div>',
-        ],
+        inputs: ['<div><!-- foo bar --></div>'],
         tree: {
           children: [
             {
@@ -186,9 +172,7 @@ describe('parser', () => {
 
       // Self closing tag with attribute with value in single quotes
       {
-        inputs: [
-          "<input value='test'/>",
-        ],
+        inputs: ["<input value='test'/>"],
         tree: {
           attributes: {
             value: 'test',
@@ -200,9 +184,7 @@ describe('parser', () => {
 
       // Self closing tag with attribute with value in double quoutes
       {
-        inputs: [
-          '<input value="test"/>',
-        ],
+        inputs: ['<input value="test"/>'],
         tree: {
           attributes: {
             value: 'test',
@@ -215,9 +197,7 @@ describe('parser', () => {
       // Self closing tag with attribute with value in single quotes, value
       // containing escaped single quote
       {
-        inputs: [
-          "<input value='foo\\'bar'/>",
-        ],
+        inputs: ["<input value='foo\\'bar'/>"],
         tree: {
           attributes: {
             value: "foo\\'bar",
@@ -230,9 +210,7 @@ describe('parser', () => {
       // Self closing tag with attribute with value in double quoutes, value
       // containing escaped double quote
       {
-        inputs: [
-          '<input value="foo\\"bar"/>',
-        ],
+        inputs: ['<input value="foo\\"bar"/>'],
         tree: {
           attributes: {
             value: 'foo\\"bar',
@@ -302,9 +280,7 @@ describe('parser', () => {
 
       // Pre tag preserves whitespace
       {
-        inputs: [
-          '<pre>\n\t foo \t\nbar \t\n</pre>',
-        ],
+        inputs: ['<pre>\n\t foo \t\nbar \t\n</pre>'],
         tree: {
           children: [
             {
@@ -363,9 +339,7 @@ describe('parser', () => {
 
       // Nested elements
       {
-        inputs: [
-          '<p><strong>Foo</strong>bar</p>',
-        ],
+        inputs: ['<p><strong>Foo</strong>bar</p>'],
         tree: {
           children: [
             {
@@ -388,9 +362,7 @@ describe('parser', () => {
         },
       },
       {
-        inputs: [
-          '<p><strong>Foo</strong>bar</p><p>baz</p>',
-        ],
+        inputs: ['<p><strong>Foo</strong>bar</p><p>baz</p>'],
         tree: {
           children: [
             {
@@ -429,12 +401,10 @@ describe('parser', () => {
 
       // Element with multiple attributes
       {
-        inputs: [
-          '<div class="foo" style="color:red"></div>',
-        ],
+        inputs: ['<div class="foo" style="color:red"></div>'],
         tree: {
           attributes: {
-            'class': 'foo',
+            class: 'foo',
             style: 'color:red',
           },
           name: 'div',
@@ -448,7 +418,7 @@ describe('parser', () => {
           '<img ' +
             'data-attachment-id="37" ' +
             'data-permalink="https://caltucky.com/about/hbgrad-32/"' +
-          '/>',
+            '/>',
         ],
         tree: {
           attributes: {
@@ -459,13 +429,12 @@ describe('parser', () => {
           type: 'element',
         },
       },
-    ]
-      .forEach(({inputs, tree}) => {
-        inputs.forEach((input) => {
-          it(esc(input), () => {
-            expect(parse(input)).toEqual(tree)
-          })
+    ].forEach(({inputs, tree}) => {
+      inputs.forEach(input => {
+        it(esc(input), () => {
+          expect(parse(input)).toEqual(tree)
         })
       })
+    })
   })
 })

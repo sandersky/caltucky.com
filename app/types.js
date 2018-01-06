@@ -23,10 +23,6 @@ export type GUID = {
   rendered: string,
 }
 
-export type Match = {
-  params: Object,
-}
-
 export type Title = {
   rendered: string,
 }

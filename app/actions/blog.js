@@ -32,109 +32,114 @@ export type State = {
 type GetState = () => State
 
 /* eslint-disable no-use-before-define */
-type ThunkAction = (dispatch: Dispatch, getState: GetState) => any
+type ThunkAction = (dispatch: Dispatch, getState: GetState) => *
 /* eslint-enable no-use-before-define */
 
 type PromiseAction = Promise<Action>
-type Dispatch = (action: Action | ThunkAction | PromiseAction) => any
+type Dispatch = (action: Action | ThunkAction | PromiseAction) => *
 
-export function addCategories (categories: Array<Category>) {
+export function addCategories(categories: Array<Category>) {
   return {
     categories,
     type: ADD_CATEGORIES,
   }
 }
 
-export function addPages (pages: Array<Page>) {
+export function addPages(pages: Array<Page>) {
   return {
     pages,
     type: ADD_PAGES,
   }
 }
 
-export function addPosts (posts: Array<Post>) {
+export function addPosts(posts: Array<Post>) {
   return {
     posts,
     type: ADD_POSTS,
   }
 }
 
-export function filterPosts (posts: Array<Post>) {
+export function filterPosts(posts: Array<Post>) {
   return {
     posts: posts,
     type: FILTER_POSTS,
   }
 }
 
-export function loadCategories () {
-  return function (dispatch: Dispatch) {
-    blog.categories()
-      .then((categories) => {
+export function loadCategories() {
+  return function(dispatch: Dispatch) {
+    blog
+      .categories()
+      .then(categories => {
         dispatch(addCategories(categories))
       })
-      .catch((err) => {
+      .catch(err => {
         // TODO: actually do something with error?
         console.error(err)
       })
   }
 }
 
-export function loadPage (slug: string) {
-  return function (dispatch: Dispatch) {
-    blog.pages({slug})
-      .then((pages) => {
+export function loadPage(slug: string) {
+  return function(dispatch: Dispatch) {
+    blog
+      .pages({slug})
+      .then(pages => {
         dispatch(addPages(pages))
       })
-      .catch((err) => {
+      .catch(err => {
         // TODO: actually do something with error?
         console.error(err)
       })
   }
 }
 
-export function loadPost (slug: string) {
-  return function (dispatch: Dispatch) {
-    blog.posts({slug})
-      .then((posts) => {
+export function loadPost(slug: string) {
+  return function(dispatch: Dispatch) {
+    blog
+      .posts({slug})
+      .then(posts => {
         dispatch(addPosts(posts))
       })
-      .catch((err) => {
+      .catch(err => {
         // TODO: actually do something with error?
         console.error(err)
       })
   }
 }
 
-export function loadPosts (options?: PostOptions) {
-  return function (dispatch: Dispatch) {
-    blog.posts(options)
-      .then((posts) => {
+export function loadPosts(options?: PostOptions) {
+  return function(dispatch: Dispatch) {
+    blog
+      .posts(options)
+      .then(posts => {
         dispatch(addPosts(posts))
       })
-      .catch((err) => {
+      .catch(err => {
         // TODO: actually do something with error?
         console.error(err)
       })
   }
 }
 
-export function search (query: string) {
-  return function (dispatch: Dispatch) {
+export function search(query: string) {
+  return function(dispatch: Dispatch) {
     dispatch(setSearchQuery(query))
 
-    blog.posts({search: query})
-      .then((posts) => {
+    blog
+      .posts({search: query})
+      .then(posts => {
         dispatch(addPosts(posts))
         dispatch(filterPosts(posts))
       })
-      .catch((err) => {
+      .catch(err => {
         // TODO: actually do something with error?
         console.error(err)
       })
   }
 }
 
-export function setSearchQuery (query: string) {
+export function setSearchQuery(query: string) {
   return {
     query,
     type: SET_SEARCH_QUERY,

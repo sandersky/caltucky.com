@@ -6,17 +6,18 @@ const React = require('react')
 const {renderToNodeStream} = require('react-dom/server')
 
 const BUNDLE_PATH = path.join(__dirname, '..', 'public', 'bundle.js')
-const SCRIPT_TAG = '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
+const SCRIPT_TAG =
+  '<script type="text/javascript" src="/bundle.js" charset="utf-8"></script>'
 const TEMPLATE_PATH = path.join(__dirname, '..', 'public', 'index.html')
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8')
 
-function createFileStream (filePath) {
+function createFileStream(filePath) {
   const dirPath = path.dirname(filePath)
   ensureDirectory(dirPath)
   return fs.createWriteStream(filePath)
 }
 
-function ensureDirectory (dirPath) {
+function ensureDirectory(dirPath) {
   const segments = dirPath.split(path.sep)
 
   // NOTE: we start at index 1 because the first segment is an empty string
@@ -29,9 +30,12 @@ function ensureDirectory (dirPath) {
   }
 }
 
-function generatePageContent (page) {
+function generatePageContent(page) {
   const filePath = path.join(
-    __dirname, '..', 'public', `${decodeURIComponent(page.slug)}.html`
+    __dirname,
+    '..',
+    'public',
+    `${decodeURIComponent(page.slug)}.html`,
   )
 
   const req = {
@@ -46,11 +50,17 @@ function generatePageContent (page) {
   return render(req, writeStream, {pages: [page]})
 }
 
-function generatePostContent (post) {
+function generatePostContent(post) {
   const [year, month, day] = post.date_gmt.toISOString().split(/[-T]/)
 
   const filePath = path.join(
-    __dirname, '..', 'public', year, month, day, `${decodeURIComponent(post.slug)}.html`
+    __dirname,
+    '..',
+    'public',
+    year,
+    month,
+    day,
+    `${decodeURIComponent(post.slug)}.html`,
   )
 
   const req = {
@@ -65,7 +75,7 @@ function generatePostContent (post) {
   return render(req, writeStream, {posts: [post]})
 }
 
-function getLocation (req) {
+function getLocation(req) {
   const host = req.headers.host
   const [hostname, port] = host.split(':')
 
@@ -79,11 +89,11 @@ function getLocation (req) {
   }
 }
 
-function getTemplate () {
+function getTemplate() {
   return TEMPLATE
 }
 
-function render (req, res, data) {
+function render(req, res, data) {
   console.info(`Server-side rendering ${req.url}`)
 
   const [beforeReactDOM, afterReactDOM] = TEMPLATE.split('<!-- render here -->')
@@ -108,8 +118,7 @@ function render (req, res, data) {
           ${code}
         </script>
         ${TEMPLATE.substr(scriptTagEndIndex)}
-      `
-        .replace(/<link([^>]*)>/g, '') // We don't care about CSS in SSR
+      `.replace(/<link([^>]*)>/g, '') // We don't care about CSS in SSR
 
       const {window} = new JSDOM(template, {
         resources: 'usable',
@@ -137,10 +146,10 @@ function render (req, res, data) {
       }
 
       const stream = renderToNodeStream(
-        React.createElement(state.Component, state.props)
+        React.createElement(state.Component, state.props),
       )
 
-      stream.on('data', (chunk) => {
+      stream.on('data', chunk => {
         res.write(chunk)
       })
 
@@ -149,7 +158,7 @@ function render (req, res, data) {
         resolve()
       })
 
-      stream.on('error', (err) => {
+      stream.on('error', err => {
         console.error(err)
         res.write(afterReactDOM.replace(/^\s*/, ''))
         resolve()
@@ -158,7 +167,7 @@ function render (req, res, data) {
   })
 }
 
-function stringify (object) {
+function stringify(object) {
   if (object === undefined) {
     return 'undefined'
   }
@@ -172,13 +181,17 @@ function stringify (object) {
   }
 
   if (Array.isArray(object)) {
-    return '[' + object.map((item) => stringify(item)).join(',') + ']'
+    return '[' + object.map(item => stringify(item)).join(',') + ']'
   }
 
   if (typeof object === 'object') {
-    return '{' + Object.keys(object).map((key) => {
-      return `'${key}':${stringify(object[key])}`
-    }).join(',') + '}'
+    return (
+      '{' +
+      Object.keys(object)
+        .map(key => `'${key}':${stringify(object[key])}`)
+        .join(',') +
+      '}'
+    )
   }
 
   return object.toString()

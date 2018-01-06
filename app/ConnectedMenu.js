@@ -13,9 +13,9 @@ const mapStateToProps = ({blog}) => {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    search (query: string) {
+    search(query: string) {
       dispatch(search(query))
     },
   }

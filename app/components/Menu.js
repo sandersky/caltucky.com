@@ -21,7 +21,7 @@ type Props = {
 const SEARCH_DEBOUNCE = 250
 
 class Menu extends React.Component<Props, void> {
-  _handleSearchKeyUp (event: SyntheticKeyboardEvent<*>) {
+  _handleSearchKeyUp(event: SyntheticKeyboardEvent<*>) {
     const element = event.currentTarget
 
     if (element instanceof HTMLInputElement) {
@@ -36,13 +36,13 @@ class Menu extends React.Component<Props, void> {
     }
   }
 
-  render () {
+  render() {
     return (
       <div className="Menu">
         <Link to="/">
-          <img alt="Caltucky" src={`/${require('../assets/logo.png')}`}/>
+          <img alt="Caltucky" src={`/${require('../assets/logo.png')}`} />
         </Link>
-        <MenuItem path="/about" text="About"/>
+        <MenuItem path="/about" text="About" />
         <input
           onKeyUp={this._handleSearchKeyUp.bind(this)}
           placeholder="search"

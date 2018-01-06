@@ -8,13 +8,10 @@ import {
   type TextNode,
 } from './types'
 
-const SELF_CLOSING_ELEMENTS = [
-  'img',
-  'input',
-]
+const SELF_CLOSING_ELEMENTS = ['img', 'input']
 
-export function compile (
-  node: ChildrenNode | CommentNode | ElementNode | TextNode
+export function compile(
+  node: ChildrenNode | CommentNode | ElementNode | TextNode,
 ): string {
   if (node.type === TEXT_TYPE) {
     return node.text
@@ -27,7 +24,7 @@ export function compile (
   }
 }
 
-export function compileElementNode (node: ElementNode): string {
+export function compileElementNode(node: ElementNode): string {
   let attributes = ''
   let children = ''
   const name = node.name
@@ -36,12 +33,15 @@ export function compileElementNode (node: ElementNode): string {
     const keys = Object.keys(node.attributes)
 
     if (keys.length) {
-      attributes = ' ' + keys.map((key) => {
-        const value = node.attributes[key]
-        const quote = '"' // TODO: figure out which quote to use based on value
-        return value === true ? key : `${key}=${quote}${value}${quote}`
-      })
-        .join(' ')
+      attributes =
+        ' ' +
+        keys
+          .map(key => {
+            const value = node.attributes[key]
+            const quote = '"' // TODO: figure out which quote to use based on value
+            return value === true ? key : `${key}=${quote}${value}${quote}`
+          })
+          .join(' ')
     }
   }
 

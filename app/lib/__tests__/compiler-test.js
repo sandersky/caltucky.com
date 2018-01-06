@@ -2,7 +2,7 @@ import {compile} from '../compiler'
 
 describe('compiler', () => {
   describe('compile', () => {
-    [
+    ;[
       {
         desc: 'text',
         input: {
@@ -139,11 +139,10 @@ describe('compiler', () => {
         },
         output: '<div><!--Foo bar--></div>',
       },
-    ]
-      .forEach(({desc, input, output}) => {
-        it(desc, () => {
-          expect(compile(input)).toBe(output)
-        })
+    ].forEach(({desc, input, output}) => {
+      it(desc, () => {
+        expect(compile(input)).toBe(output)
       })
+    })
   })
 })

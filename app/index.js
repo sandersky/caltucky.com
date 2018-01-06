@@ -28,7 +28,9 @@ if (window._ssr) {
   }
 
   const history = createBrowserHistory()
-  const isServerSideRendered = node ? node.querySelectorAll('div').length !== 0 : false
+  const isServerSideRendered = node
+    ? node.querySelectorAll('div').length !== 0
+    : false
   const renderMethod = isServerSideRendered ? hydrate : render
-  renderMethod(<App history={history} ssr={false}/>, node)
+  renderMethod(<App history={history} ssr={false} />, node)
 }

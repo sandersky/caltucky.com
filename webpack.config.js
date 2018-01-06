@@ -6,11 +6,11 @@ const webpack = require('webpack')
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 const PUBLIC_PATH = path.join(__dirname, 'public')
 
-function getPlugins () {
+function getPlugins() {
   const plugins = [
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': `"${process.env.NODE_ENV}"`,
+        NODE_ENV: `"${process.env.NODE_ENV}"`,
       },
     }),
     new ExtractTextPlugin('styles.css'),
@@ -21,7 +21,7 @@ function getPlugins () {
       new UglifyJSPlugin({
         extractComments: true,
         sourceMap: true,
-      })
+      }),
     )
   }
 
@@ -64,7 +64,9 @@ module.exports = {
       },
       {
         exclude: [/node_modules/],
-        loaders: ['file-loader?hash=sha512&digest=hex&name=assets/[hash].[ext]'],
+        loaders: [
+          'file-loader?hash=sha512&digest=hex&name=assets/[hash].[ext]',
+        ],
         test: /\.(gif|jpe?g|png|svg)$/,
       },
       {

@@ -27,10 +27,10 @@ export default (state: State, action: Action) => {
 
       // Get ids of existing categories so we can quickly check whether or not a
       // category is already in our list
-      const ids = categories.map((category) => category.id)
+      const ids = categories.map(category => category.id)
       const nextCategories = Array.from(categories)
 
-      action.categories.forEach((category) => {
+      action.categories.forEach(category => {
         // If category is not already in our list
         if (!ids.includes(category.id)) {
           // Figure out where to insert category in order to keep list sorted by
@@ -62,10 +62,10 @@ export default (state: State, action: Action) => {
 
       // Get ids of existing pages so we can quickly check whether or not a page
       // is already in our list
-      const ids = pages.map((page) => page.id)
+      const ids = pages.map(page => page.id)
       const nextPages = Array.from(pages)
 
-      action.pages.forEach((page) => {
+      action.pages.forEach(page => {
         // If page is not already in our list
         if (!ids.includes(page.id)) {
           nextPages.push(page)
@@ -86,10 +86,10 @@ export default (state: State, action: Action) => {
 
       // Get ids of existing posts so we can quickly check whether or not a post
       // is already in our list
-      const ids = posts.map((post) => post.id)
+      const ids = posts.map(post => post.id)
       const nextPosts = Array.from(posts)
 
-      action.posts.forEach((post) => {
+      action.posts.forEach(post => {
         // If post is not already in our list
         if (!ids.includes(post.id)) {
           // Figure out where to insert post in order to keep list sorted by

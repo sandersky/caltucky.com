@@ -15,13 +15,13 @@ const mapStateToProps = ({blog}, {match}) => {
 
   return {
     error: blog.postsError,
-    post: blog.posts.find((post) => post.slug.toUpperCase() === slug),
+    post: blog.posts.find(post => post.slug.toUpperCase() === slug),
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    loadPost (slug: string) {
+    loadPost(slug: string) {
       dispatch(loadPost(slug))
     },
   }

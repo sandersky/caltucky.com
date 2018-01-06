@@ -3,10 +3,11 @@
  */
 
 import React from 'react'
+import {type Match} from 'react-router-dom'
 
 import {compile} from '../lib/compiler'
 import {parse} from '../lib/parser'
-import type {Match, Post as PostType} from '../types'
+import type {Post as PostType} from '../types'
 // $FlowFixMe
 import './Post.scss'
 
@@ -17,38 +18,38 @@ type Props = {
   post?: PostType,
 }
 
-function normalizedContent (content: string) {
+function normalizedContent(content: string) {
   const ast = parse(content)
   // TODO: apply transforms here
   return compile(ast)
 }
 
 class Post extends React.Component<Props, void> {
-  componentWillMount () {
+  componentWillMount() {
     if (!this.props.post) {
       this.props.loadPost(this.props.match.params.slug)
     }
   }
 
-  _renderErrorState (error: Error) {
+  _renderErrorState(error: Error) {
     return 'An error occurred'
   }
 
-  _renderLoadedState (post: PostType) {
+  _renderLoadedState(post: PostType) {
     const {content, title} = post
     const contentObject = {__html: normalizedContent(content.rendered)}
 
     return [
       <h2 key="title">{title.rendered}</h2>,
-      <div dangerouslySetInnerHTML={contentObject} key="content"/>,
+      <div dangerouslySetInnerHTML={contentObject} key="content" />,
     ]
   }
 
-  _renderLoadingState () {
+  _renderLoadingState() {
     return 'Loading post'
   }
 
-  render () {
+  render() {
     const {error, post} = this.props
 
     let child
@@ -61,11 +62,7 @@ class Post extends React.Component<Props, void> {
       child = this._renderLoadingState()
     }
 
-    return (
-      <div className="Post">
-        {child}
-      </div>
-    )
+    return <div className="Post">{child}</div>
   }
 }
 

@@ -2,13 +2,7 @@
  * @flow
  */
 
-import type {
-  Category,
-  Page,
-  Post,
-  RawPage,
-  RawPost,
-} from '../types'
+import type {Category, Page, Post, RawPage, RawPost} from '../types'
 
 export type CategoryOptions = {
   page?: number,
@@ -33,34 +27,35 @@ export type PostOptions = {
 const WORDPRESS_ENDPOINT =
   'https://public-api.wordpress.com/wp/v2/sites/caltucky.com'
 
-function fetchData (path: string, params?: {[string]: any}): Object {
+// eslint-disable-next-line flowtype/no-weak-types
+function fetchData(path: string, params?: {[string]: any}): Object {
   let url = `${WORDPRESS_ENDPOINT}/${path}`
 
   if (params) {
     url = getURLWithQueryString(url, params)
   }
 
-  return fetch(url)
-    .then((resp) => {
-      if (resp.status === 200) {
-        return resp.json()
-      }
+  return fetch(url).then(resp => {
+    if (resp.status === 200) {
+      return resp.json()
+    }
 
-      throw new Error()
-    })
+    throw new Error()
+  })
 }
 
-function getURLWithQueryString (url, params: {[string]: any}) {
+// eslint-disable-next-line flowtype/no-weak-types
+function getURLWithQueryString(url, params: {[string]: any}) {
   const queryString = Object.keys(params)
-    .map((key) => params[key] ? `${key}=${params[key]}` : null)
-    .filter((value) => value !== null)
+    .map(key => (params[key] ? `${key}=${params[key]}` : null))
+    .filter(value => value !== null)
     .join('&')
 
   return `${url}?${queryString}`
 }
 
-function normalizePages (pages: Array<RawPage>): Array<Page> {
-  return pages.map((page) => {
+function normalizePages(pages: Array<RawPage>): Array<Page> {
+  return pages.map(page => {
     return {
       ...page,
       date: new Date(page.date),
@@ -71,8 +66,8 @@ function normalizePages (pages: Array<RawPage>): Array<Page> {
   })
 }
 
-function normalizePosts (posts: Array<RawPost>): Array<Post> {
-  return posts.map((post) => {
+function normalizePosts(posts: Array<RawPost>): Array<Post> {
+  return posts.map(post => {
     return {
       ...post,
       date: new Date(post.date),
@@ -84,15 +79,15 @@ function normalizePosts (posts: Array<RawPost>): Array<Post> {
 }
 
 export default {
-  categories (options?: CategoryOptions): Promise<Array<Category>> {
+  categories(options?: CategoryOptions): Promise<Array<Category>> {
     return fetchData('categories', options)
   },
 
-  pages (options?: PageOptions) {
+  pages(options?: PageOptions) {
     return fetchData('pages', options).then(normalizePages)
   },
 
-  posts (options?: PostOptions): Promise<Array<Post>> {
+  posts(options?: PostOptions): Promise<Array<Post>> {
     return fetchData('posts', options).then(normalizePosts)
   },
 }

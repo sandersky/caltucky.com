@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 // TODO: figure out how to handle images so that they actually work properly
-function cleanupFile (filePath) {
+function cleanupFile(filePath) {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf8', (err, data) => {
       if (err) {
@@ -19,7 +19,7 @@ function cleanupFile (filePath) {
           // Don't try to import image files
           .replace(/require\(('|")([^'"]+)\.(jpeg|jpg|png)('|")\)/g, "''")
 
-        fs.writeFile(filePath, data, (err) => {
+        fs.writeFile(filePath, data, err => {
           if (err) {
             reject(err)
           } else {
@@ -31,14 +31,14 @@ function cleanupFile (filePath) {
   })
 }
 
-function cleanupFiles (dirPath) {
+function cleanupFiles(dirPath) {
   return new Promise((resolve, reject) => {
     fs.readdir(dirPath, (err, files) => {
       if (err) {
         reject(err)
       } else {
         Promise.all(
-          files.map((fileName) => {
+          files.map(fileName => {
             const filePath = path.join(dirPath, fileName)
             const stats = fs.lstatSync(filePath)
 
@@ -47,12 +47,12 @@ function cleanupFiles (dirPath) {
             } else if (stats.isFile()) {
               return cleanupFile(filePath)
             }
-          })
+          }),
         )
           .then(() => {
             resolve()
           })
-          .catch((err2) => {
+          .catch(err2 => {
             reject(err2)
           })
       }
@@ -60,9 +60,7 @@ function cleanupFiles (dirPath) {
   })
 }
 
-cleanupFiles(
-  path.join(__dirname, '..', 'server', 'app')
-)
+cleanupFiles(path.join(__dirname, '..', 'server', 'app'))
   .then(() => {
     console.info('COMPLETE!')
   })

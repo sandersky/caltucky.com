@@ -5,7 +5,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Provider} from 'react-redux'
-import {Router, Route, Switch} from 'react-router-dom'
+import {Route, Router, type RouterHistory, Switch} from 'react-router-dom'
 import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 
@@ -17,13 +17,10 @@ import Page from './PageRoute'
 import Post from './PostRoute'
 import appReducer from './reducers'
 
-window._store = createStore(
-  appReducer,
-  applyMiddleware(thunk)
-)
+window._store = createStore(appReducer, applyMiddleware(thunk))
 
 type Props = {
-  history?: any, // TODO: add History type
+  history?: RouterHistory,
   ssr?: boolean,
 }
 
@@ -36,24 +33,24 @@ class App extends React.Component<Props, void> {
     ssr: false,
   }
 
-  getChildContext () {
+  getChildContext() {
     return {
       ssr: this.props.ssr,
     }
   }
 
-  render () {
+  render() {
     return (
       <Provider store={window._store}>
         <Router history={this.props.history}>
           <div className="App">
-            <ConnectedMenu/>
+            <ConnectedMenu />
             <div className="AppContentPane">
-              <div/>
+              <div />
               <Switch>
-                <Route component={Feed} exact path="/"/>
-                <Route component={Post} path="/:year/:month/:day/:slug"/>
-                <Route component={Page} path="/:slug"/>
+                <Route component={Feed} exact path="/" />
+                <Route component={Post} path="/:year/:month/:day/:slug" />
+                <Route component={Page} path="/:slug" />
               </Switch>
             </div>
           </div>

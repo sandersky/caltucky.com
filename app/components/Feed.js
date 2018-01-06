@@ -25,13 +25,12 @@ class Feed extends React.Component<Props, void> {
   _element: HTMLElement
   _isLoadingPosts: boolean
 
-  componentDidMount () {
+  componentDidMount() {
     this._isLoadingPosts = true
-    const per_page = this._getPerPageValue()
-    this.props.loadPosts({per_page})
+    this.props.loadPosts({per_page: this._getPerPageValue()})
   }
 
-  componentWillReceiveProps (nextProps: Props) {
+  componentWillReceiveProps(nextProps: Props) {
     if (
       this._isLoadingPosts &&
       this.props.posts.length !== nextProps.posts.length
@@ -40,11 +39,11 @@ class Feed extends React.Component<Props, void> {
     }
   }
 
-  _findPostIndex (id: number) {
-    return this.props.posts.findIndex((post) => post.id === id)
+  _findPostIndex(id: number) {
+    return this.props.posts.findIndex(post => post.id === id)
   }
 
-  _focusPostAtIndex (index: number) {
+  _focusPostAtIndex(index: number) {
     const {posts} = this.props
 
     if (index < 0) {
@@ -53,8 +52,9 @@ class Feed extends React.Component<Props, void> {
       index = posts.length - 1
     }
 
-    const element: ?HTMLElement = this._element
-      .querySelector(`.FeedPost:nth-child(${index + 1})`)
+    const element: ?HTMLElement = this._element.querySelector(
+      `.FeedPost:nth-child(${index + 1})`,
+    )
 
     if (element) {
       element.focus()
@@ -63,7 +63,7 @@ class Feed extends React.Component<Props, void> {
     }
   }
 
-  _getPerPageValue () {
+  _getPerPageValue() {
     const {clientHeight, clientWidth} = this._element
     const FEED_POST_OUTER_WIDTH = FEED_POST_WIDTH + FEED_POST_MARGIN * 2
     const cols = Math.floor(clientWidth / FEED_POST_OUTER_WIDTH)
@@ -76,7 +76,7 @@ class Feed extends React.Component<Props, void> {
     return cols * rows
   }
 
-  _handlePostKeyUp (id: number, event: SyntheticKeyboardEvent<*>) {
+  _handlePostKeyUp(id: number, event: SyntheticKeyboardEvent<*>) {
     switch (event.keyCode) {
       case ARROW_DOWN: {
         // TODO: focus on post below current post
@@ -102,7 +102,7 @@ class Feed extends React.Component<Props, void> {
     }
   }
 
-  _handleScroll (event: SyntheticUIEvent<*>) {
+  _handleScroll(event: SyntheticUIEvent<*>) {
     const element = event.currentTarget
 
     if (element instanceof HTMLElement) {
@@ -115,35 +115,38 @@ class Feed extends React.Component<Props, void> {
         currentHeight > scrollHeight - SCROLL_BUFFER
       ) {
         this._isLoadingPosts = true
+        const index = this.props.posts.length - 1
         this.props.loadPosts({
-          before: this.props.posts[this.props.posts.length - 1].date.toISOString(),
+          before: this.props.posts[index].date.toISOString(),
           per_page: this._getPerPageValue(),
         })
       }
     }
   }
 
-  _renderErrorState (error: Error) {
+  _renderErrorState(error: Error) {
     return 'Failed to retrieve posts'
   }
 
-  _renderLoadedState () {
-    return this.props.posts.map((post) => {
-      return <FeedPost
-        key={post.id}
-        onKeyUp={this._handlePostKeyUp.bind(this, post.id)}
-        margin={FEED_POST_MARGIN}
-        post={post}
-        width={FEED_POST_WIDTH}
-      />
+  _renderLoadedState() {
+    return this.props.posts.map(post => {
+      return (
+        <FeedPost
+          key={post.id}
+          onKeyUp={this._handlePostKeyUp.bind(this, post.id)}
+          margin={FEED_POST_MARGIN}
+          post={post}
+          width={FEED_POST_WIDTH}
+        />
+      )
     })
   }
 
-  _renderLoadingState () {
+  _renderLoadingState() {
     return 'Loading'
   }
 
-  render () {
+  render() {
     const {error, posts} = this.props
 
     let child
@@ -160,7 +163,7 @@ class Feed extends React.Component<Props, void> {
       <div
         className="Feed"
         onScroll={this._handleScroll.bind(this)}
-        ref={(el) => {
+        ref={el => {
           if (el) {
             this._element = el
           }

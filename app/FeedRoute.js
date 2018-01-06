@@ -17,9 +17,9 @@ const mapStateToProps = ({blog}) => {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    loadPosts (options?: PostOptions) {
+    loadPosts(options?: PostOptions) {
       dispatch(loadPosts(options))
     },
   }
