@@ -35,6 +35,7 @@
     "babel-core": "^7.0.0-0",
     "babel-jest": "22.0.4",
     "babel-loader": "7.1.2",
+    "babel-plugin-auto-css-modules": "0.0.1",
     "css-loader": "0.28.8",
     "enzyme": "3.3.0",
     "enzyme-adapter-react-16": "1.1.1",
