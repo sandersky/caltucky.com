@@ -6,8 +6,6 @@ import React from 'react'
 
 import timer, {type SetTimeout} from '../../lib/timer'
 import ssr from '../../lib/ssr'
-// $FlowFixMe
-import './FadeAndRotate.scss'
 
 type Props = {
   duration?: number,

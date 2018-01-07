@@ -9,8 +9,6 @@ import {Link} from 'react-router-dom'
 
 import {ENTER} from '../lib/keycodes'
 import timer, {type SetTimeout} from '../lib/timer'
-// $FlowFixMe
-import './Menu.scss'
 import MenuItem from './MenuItem'
 
 type Props = {

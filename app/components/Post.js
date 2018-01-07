@@ -2,14 +2,13 @@
  * @flow
  */
 
+import nullthrows from 'nullthrows'
 import React from 'react'
 import {type Match} from 'react-router-dom'
 
 import {compile} from '../lib/compiler'
 import {parse} from '../lib/parser'
 import type {Post as PostType} from '../types'
-// $FlowFixMe
-import './Post.scss'
 
 type Props = {
   error?: Error,
@@ -27,7 +26,7 @@ function normalizedContent(content: string) {
 class Post extends React.Component<Props, void> {
   componentWillMount() {
     if (!this.props.post) {
-      this.props.loadPost(this.props.match.params.slug)
+      this.props.loadPost(nullthrows(this.props.match.params.slug))
     }
   }
 

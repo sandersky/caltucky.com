@@ -13,7 +13,7 @@ function cleanupFile(filePath) {
         data = data
           // Strip out stylesheet imports since we don't care about them on
           // server-side rendering and their presence won't play nice with Node
-          .replace(/require\(('|")([^'"]+)\.(css|sass|scss)('|")\);/g, '')
+          .replace(/require\(('|")([^'"]+)\.css('|")\);/g, '')
           // Replace window with global so it is compliant with Node environment
           .replace(/window/g, 'global')
           // Don't try to import image files

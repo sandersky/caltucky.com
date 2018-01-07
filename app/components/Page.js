@@ -2,14 +2,13 @@
  * @flow
  */
 
+import nullthrows from 'nullthrows'
 import React from 'react'
 import {type Match} from 'react-router-dom'
 
 import {compile} from '../lib/compiler'
 import {parse} from '../lib/parser'
 import type {Page as PageType} from '../types'
-// $FlowFixMe
-import './Page.scss'
 
 type Props = {
   error?: Error,
@@ -27,7 +26,7 @@ function normalizedContent(content: string) {
 class Page extends React.Component<Props, void> {
   componentWillMount() {
     if (!this.props.page) {
-      this.props.loadPage(this.props.match.params.slug)
+      this.props.loadPage(nullthrows(this.props.match.params.slug))
     }
   }
 

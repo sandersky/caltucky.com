@@ -9,8 +9,6 @@ import {Route, Router, type RouterHistory, Switch} from 'react-router-dom'
 import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 
-// $FlowFixMe
-import './App.scss'
 import ConnectedMenu from './ConnectedMenu'
 import Feed from './FeedRoute'
 import Page from './PageRoute'
@@ -20,8 +18,8 @@ import appReducer from './reducers'
 window._store = createStore(appReducer, applyMiddleware(thunk))
 
 type Props = {
-  history?: RouterHistory,
-  ssr?: boolean,
+  history: RouterHistory,
+  ssr: boolean,
 }
 
 class App extends React.Component<Props, void> {

@@ -5,8 +5,6 @@
 import React from 'react'
 
 import type {Post} from '../types'
-// $FlowFixMe
-import './FeedPost.scss'
 import FadeAndRotate from './transitions/FadeAndRotate'
 
 type Props = {

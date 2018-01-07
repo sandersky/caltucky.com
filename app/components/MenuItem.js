@@ -5,9 +5,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-// $FlowFixMe
-import './MenuItem.scss'
-
 type Props = {
   path: string,
   text: string,

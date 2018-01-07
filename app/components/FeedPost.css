@@ -12,7 +12,7 @@
     outline: 3px solid navy;
   }
 
-  h3 {
+  & h3 {
     background: rgba(255, 255, 255, 0.7);
     color: black;
     left: 0;

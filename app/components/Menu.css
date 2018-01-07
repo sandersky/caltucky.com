@@ -6,7 +6,7 @@
   flex: none;
   padding: 6;
 
-  input {
+  & input {
     font: 120% Raleway, sans-serif;
     flex: 1;
     height: 30;

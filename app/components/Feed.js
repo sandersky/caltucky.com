@@ -5,8 +5,6 @@
 import React from 'react'
 
 import {type PostOptions} from '../actions/wordpress'
-// $FlowFixMe
-import './Feed.scss'
 import FeedPost from './FeedPost'
 import {ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP} from '../lib/keycodes'
 import type {Post as PostType} from '../types'
